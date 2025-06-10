@@ -8,6 +8,7 @@ import Analytics from '../analytics/Analytics';
 import Settings from '../settings/Settings';
 // import ReportsDashboard from '../reports/ReportsDashboard';
 import AdminReportModule from '../reports/AdminReportModule';
+import ReportForm from '../reports/ReportForm';
 
 const MainContent = () => {
   const { activeModule, menuItems } = useDashboard();
@@ -21,7 +22,7 @@ const MainContent = () => {
       case 'cases':
         return <CaseManagement />;
       case 'reports':
-        return <AdminReportModule />;
+        return <ReportForm />;
       case 'victims':
         return <VictimDatabase />;
       case 'analytics':
