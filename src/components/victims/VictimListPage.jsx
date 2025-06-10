@@ -1,26 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, {useEffect, useState} from 'react';
 import VictimCard from './VictimCard';
+import AddVictimModal from './AddVictimModal';
+import {listWaitingVictims, updateVictimListByCase} from '../../services/victimsService';
 
 const VictimListPage = () => {
     const [victims, setVictims] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedVictim, setSelectedVictim] = useState(null);
 
-    const fetchVictims = () => {
-        axios.get('http://127.0.0.1:8000/victims/waited/')
-            .then((res) => {
-                const allVictims = res.data.flatMap((entry) =>
-                    (entry.victims || []).map((v) => ({
-                        ...v,
-                        case_id: entry.case_id?.$oid || entry.case_id,
-                        _id: v._id || `${entry._id?.$oid || entry._id}-${v.name}`,
-                        parent_id: entry._id?.$oid || entry._id, // for approve/delete
-                    }))
-                );
-                setVictims(allVictims);
-            })
-            .catch((err) => {
-                console.error('Error fetching victims:', err);
-            });
+    const fetchVictims = async () => {
+        try {
+            const data = await listWaitingVictims();
+            const allVictims = data.flatMap((entry) =>
+                (entry.victims || []).map((v) => ({
+                    ...v,
+                    case_id: entry.case_id?.$oid || entry.case_id,
+                    _id: v._id || `${entry._id?.$oid || entry._id}-${v.name}`,
+                    parent_id: entry._id?.$oid || entry._id,
+                }))
+            );
+            setVictims(allVictims);
+        } catch (err) {
+            console.error('Error fetching victims:', err);
+        }
     };
 
     useEffect(() => {
@@ -28,29 +30,15 @@ const VictimListPage = () => {
     }, []);
 
     const handleApprove = (victim) => {
-        axios.patch(`http://localhost:8000/victims/approve/${victim.parent_id}`, {
-            name: victim.name,
-        })
-            .then(() => {
-                console.log(`Approved: ${victim.name}`);
-                fetchVictims(); // Refresh list
-            })
-            .catch((err) => {
-                console.error('Approval failed:', err);
-            });
+        setSelectedVictim(victim);
+        setShowModal(true);
     };
 
-    const handleDelete = (victim) => {
-        axios.delete(`http://localhost:8000/victims/delete/${victim.parent_id}`, {
-            data: { name: victim.name },
-        })
-            .then(() => {
-                console.log(`Deleted: ${victim.name}`);
-                fetchVictims(); // Refresh list
-            })
-            .catch((err) => {
-                console.error('Delete failed:', err);
-            });
+    const handleDelete = async (victim) => {
+        const remainingVictims = victims.filter(v => v.parent_id === victim.parent_id);
+        const updatedList = remainingVictims.filter(v => v.name !== victim.name);
+        await updateVictimListByCase(victim.case_id, updatedList);
+        await fetchVictims();
     };
 
     return (
@@ -70,6 +58,17 @@ const VictimListPage = () => {
                         />
                     ))}
                 </div>
+            )}
+
+            {selectedVictim && (
+                <AddVictimModal
+                    visible={showModal}
+                    onHide={() => {
+                        setShowModal(false);
+                        setSelectedVictim(null);
+                    }}
+                    prefillVictim={selectedVictim}
+                />
             )}
         </div>
     );

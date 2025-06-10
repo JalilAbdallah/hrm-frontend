@@ -8,7 +8,6 @@ import Analytics from '../analytics/Analytics';
 import Settings from '../settings/Settings';
 // import ReportsDashboard from '../reports/ReportsDashboard';
 import AdminReportModule from '../reports/AdminReportModule';
-import AddVictimPage from "../../pages/AddVictimPage.jsx";
 import VictimListPage from "../victims/VictimListPage.jsx";
 
 const MainContent = () => {
