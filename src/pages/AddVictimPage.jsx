@@ -8,6 +8,7 @@ import axios from "axios";
 
 const AddVictimPage = () => {
     const [victim, setVictim] = useState({
+        victim_type: "victim", // NEW FIELD
         name: "",
         anonymous: false,
         gender: "",
@@ -33,6 +34,10 @@ const AddVictimPage = () => {
         { label: "Moderate", value: "moderate" },
         { label: "High", value: "high" }
     ];
+    const victimTypes = [
+        { label: "Victim", value: "victim" },
+        { label: "Witness", value: "witness" }
+    ];
 
     useEffect(() => {
         axios.get("http://localhost:8000/api/cases")
@@ -54,14 +59,30 @@ const AddVictimPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log("Submitting victim:", victim);
+        console.log("Submitting victim/witness:", victim);
     };
 
     return (
         <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-xl border border-gray-200 mt-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Add New Victim</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Add New Victim/Witness</h2>
 
             <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
+
+                {/* Victim/Witness Dropdown */}
+                <span className="p-float-label col-span-2">
+                    <Dropdown
+                        id="victim_type"
+                        value={victim.victim_type}
+                        options={victimTypes}
+                        onChange={(e) => handleChange("victim_type", e.value)}
+                        className="w-full"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Select Type"
+                    />
+                    <label htmlFor="victim_type">Victim or Witness</label>
+                </span>
+
                 {/* Case Selection */}
                 <span className="p-float-label col-span-2">
                     <Dropdown
@@ -167,8 +188,6 @@ const AddVictimPage = () => {
                     <label htmlFor="phone">Phone</label>
                 </span>
 
-
-
                 {/* Risk Assessment */}
                 <span className="p-float-label">
                     <Dropdown
@@ -194,7 +213,7 @@ const AddVictimPage = () => {
                 </div>
 
                 <div className="col-span-2">
-                    <Button label="Submit Victim" type="submit" className="w-full" />
+                    <Button label="Submit Victim/Witness" type="submit" className="w-full" />
                 </div>
             </form>
         </div>

@@ -1,46 +1,45 @@
-import React from 'react';
-import { Dropdown } from 'primereact/dropdown';
+import React, { useState, useRef } from 'react';
+import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import axios from 'axios';
+import { ConfirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog } from 'primereact/confirmdialog';
 
-const riskLevels = [
-    { label: 'Low', value: 'low' },
-    { label: 'Moderate', value: 'moderate' },
-    { label: 'High', value: 'high' },
-];
+const VictimCard = ({ victim, onApprove, onDelete }) => {
+    const toastRef = useRef(null);
+    const [visible, setVisible] = useState(false);
 
-const VictimCard = ({ victim }) => {
-    const [risk, setRisk] = React.useState(victim.risk_level);
-    const toastRef = React.useRef(null);
+    const handleApprove = () => {
+        onApprove(victim);
+        toastRef.current?.show({
+            severity: 'success',
+            summary: 'Approved',
+            detail: `${victim.name} has been approved.`,
+            life: 2000,
+        });
+    };
 
-    const updateRiskLevel = async (newRisk) => {
-        try {
-            setRisk(newRisk);
-
-            await axios.patch(`http://localhost:5000/api/victim/${victim._id}/risk`, {
-                risk_level: newRisk,
-            });
-
-            toastRef.current?.show({
-                severity: 'success',
-                summary: 'Updated',
-                detail: `Risk level changed to "${newRisk}"`,
-                life: 2000,
-            });
-        } catch (error) {
-            console.error('API error:', error);
-            toastRef.current?.show({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Failed to update risk level.',
-                life: 3000,
-            });
-        }
+    const handleDelete = () => {
+        confirmDialog({
+            message: `Are you sure you want to delete ${victim.name}?`,
+            header: 'Delete Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => {
+                onDelete(victim);
+                toastRef.current?.show({
+                    severity: 'warn',
+                    summary: 'Deleted',
+                    detail: `${victim.name} has been deleted.`,
+                    life: 2000,
+                });
+            },
+        });
     };
 
     return (
         <div className="p-4 border rounded shadow-sm bg-white space-y-2">
             <Toast ref={toastRef} />
+            <ConfirmDialog />
+
             <h3 className="text-lg font-bold text-gray-900">
                 {victim.anonymous ? 'Anonymous' : victim.name}
             </h3>
@@ -48,14 +47,18 @@ const VictimCard = ({ victim }) => {
             <p>Age: {victim.age ?? 'Unknown'}</p>
             <p>Occupation: {victim.occupation}</p>
 
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Risk Level</label>
-                <Dropdown
-                    value={risk}
-                    options={riskLevels}
-                    onChange={(e) => updateRiskLevel(e.value)}
-                    placeholder="Select risk level"
-                    className="w-full"
+            <div className="flex gap-2 mt-3">
+                <Button
+                    label="Approve"
+                    icon="pi pi-check"
+                    className="p-button-success"
+                    onClick={handleApprove}
+                />
+                <Button
+                    label="Delete"
+                    icon="pi pi-trash"
+                    className="p-button-danger"
+                    onClick={handleDelete}
                 />
             </div>
         </div>
