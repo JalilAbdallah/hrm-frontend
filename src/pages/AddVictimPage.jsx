@@ -1,7 +1,7 @@
-// src/pages/AddVictimPage.jsx
 import React, { useEffect, useState } from "react";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
+import { InputNumber } from "primereact/inputnumber";
 import { Dropdown } from "primereact/dropdown";
 import { Checkbox } from "primereact/checkbox";
 import axios from "axios";
@@ -11,12 +11,11 @@ const AddVictimPage = () => {
         name: "",
         anonymous: false,
         gender: "",
-        age: "",
+        age: null,
         occupation: "",
         ethnicity: "",
         email: "",
         phone: "",
-        secure_messaging: "",
         risk_level: "",
         protection_needed: false,
         case_id: "",
@@ -24,12 +23,19 @@ const AddVictimPage = () => {
 
     const [cases, setCases] = useState([]);
 
-    const genders = ["male", "female", "other"];
-    const riskLevels = ["low", "moderate", "high"];
+    const genders = [
+        { label: "Male", value: "male" },
+        { label: "Female", value: "female" },
+        { label: "Other", value: "other" }
+    ];
+    const riskLevels = [
+        { label: "Low", value: "low" },
+        { label: "Moderate", value: "moderate" },
+        { label: "High", value: "high" }
+    ];
 
-    // Fetch cases from backend
     useEffect(() => {
-        axios.get("http://localhost:8000/api/cases") // Update this to match your backend
+        axios.get("http://localhost:8000/api/cases")
             .then(res => {
                 const caseOptions = res.data.map(c => ({
                     label: `${c.case_id} - ${c.incident_details?.title ?? 'Untitled'}`,
@@ -49,20 +55,15 @@ const AddVictimPage = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         console.log("Submitting victim:", victim);
-
-        // Optionally submit to backend:
-        // axios.post("http://localhost:8000/api/victims", victim)
-        //   .then(res => console.log("Victim created", res.data))
-        //   .catch(err => console.error("Error creating victim", err));
     };
 
     return (
-        <div className="p-6 max-w-3xl mx-auto space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800">Add New Victim</h2>
+        <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-xl border border-gray-200 mt-6">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Add New Victim</h2>
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
                 {/* Case Selection */}
-                <span className="p-float-label">
+                <span className="p-float-label col-span-2">
                     <Dropdown
                         id="case_id"
                         value={victim.case_id}
@@ -77,7 +78,7 @@ const AddVictimPage = () => {
                 </span>
 
                 {/* Anonymous Checkbox */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 col-span-2">
                     <Checkbox
                         inputId="anon"
                         checked={victim.anonymous}
@@ -106,17 +107,20 @@ const AddVictimPage = () => {
                                 options={genders}
                                 onChange={(e) => handleChange("gender", e.value)}
                                 className="w-full"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select gender"
                             />
                             <label htmlFor="gender">Gender</label>
                         </span>
 
                         <span className="p-float-label">
-                            <InputText
+                            <InputNumber
                                 id="age"
-                                type="number"
                                 value={victim.age}
-                                onChange={(e) => handleChange("age", e.target.value)}
+                                onValueChange={(e) => handleChange("age", e.value)}
                                 className="w-full"
+                                placeholder="Age"
                             />
                             <label htmlFor="age">Age</label>
                         </span>
@@ -143,7 +147,6 @@ const AddVictimPage = () => {
                     </>
                 )}
 
-                {/* Contact Fields */}
                 <span className="p-float-label">
                     <InputText
                         id="email"
@@ -164,15 +167,7 @@ const AddVictimPage = () => {
                     <label htmlFor="phone">Phone</label>
                 </span>
 
-                <span className="p-float-label">
-                    <InputText
-                        id="secure_messaging"
-                        value={victim.secure_messaging}
-                        onChange={(e) => handleChange("secure_messaging", e.target.value)}
-                        className="w-full"
-                    />
-                    <label htmlFor="secure_messaging">Secure Messaging</label>
-                </span>
+
 
                 {/* Risk Assessment */}
                 <span className="p-float-label">
@@ -182,11 +177,14 @@ const AddVictimPage = () => {
                         options={riskLevels}
                         onChange={(e) => handleChange("risk_level", e.value)}
                         className="w-full"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Select risk level"
                     />
                     <label htmlFor="risk_level">Risk Level</label>
                 </span>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 col-span-2">
                     <Checkbox
                         inputId="protection_needed"
                         checked={victim.protection_needed}
@@ -195,7 +193,9 @@ const AddVictimPage = () => {
                     <label htmlFor="protection_needed">Protection Needed</label>
                 </div>
 
-                <Button label="Submit Victim" type="submit" className="mt-4" />
+                <div className="col-span-2">
+                    <Button label="Submit Victim" type="submit" className="w-full" />
+                </div>
             </form>
         </div>
     );
