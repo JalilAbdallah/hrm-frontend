@@ -1,3 +1,4 @@
+import { Loader2 } from 'lucide-react'; // Assuming you have lucide-react installed
 const Button = ({ 
   children, 
   type = "button", 
@@ -6,6 +7,7 @@ const Button = ({
   className = "",
   disabled = false,
   onClick,
+  isLoading = false,
   ...props 
 }) => {
   const baseClasses = "font-semibold rounded-lg transition-all duration-200 focus:outline-none";
@@ -28,11 +30,18 @@ const Button = ({
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${disabledClasses} ${className}`}
       {...props}
     >
-      {children}
+      {isLoading ? (
+        <div className="flex items-center justify-center gap-2">
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span>Loading...</span>
+        </div>
+      ) : (
+        children
+      )}
     </button>
   );
 };
