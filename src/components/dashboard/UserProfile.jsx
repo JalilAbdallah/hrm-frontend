@@ -1,22 +1,21 @@
 import { User, ChevronDown, Settings, LogOut } from 'lucide-react';
 import DropdownMenu, { DropdownItem } from '../common/DropdownMenu';
+import { useAuth } from '../../context/AuthContext';
+import { useDashboard } from '../../context/DashboardContext';
 
 const UserProfile = ({ 
-  showUserMenu, 
-  setShowUserMenu, 
-  sidebarCollapsed,
   userName = "Admin User",
-  onProfileSettings,
-  onLogout
 }) => {
+  const { logout } = useAuth();
+  const { showUserMenu, setShowUserMenu, sidebarCollapsed } = useDashboard();
+
   const handleProfileSettings = () => {
     setShowUserMenu(false);
-    if (onProfileSettings) onProfileSettings();
   };
 
   const handleLogout = () => {
     setShowUserMenu(false);
-    if (onLogout) onLogout();
+    logout(); // Call the logout function from AuthContext
   };
 
   return (
