@@ -30,7 +30,7 @@ const victimTypes = [
 const AddVictimModal = ({visible, onHide, prefillVictim, prevVictims}) => {
     const toast = useRef(null);
     const {user} = useAuth();
-    const currentUserId = user?._id;
+    const currentUserId = user?.id;
 
     const [victim, setVictim] = useState({
         victim_type: "victim",
