@@ -2,6 +2,7 @@ import { useDashboard } from '../../context/DashboardContext';
 import SidebarHeader from './SidebarHeader';
 import SidebarNavigation from './SidebarNavigation';
 import UserProfile from './UserProfile';
+import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = () => {
   const { 
@@ -14,6 +15,7 @@ const Sidebar = () => {
     setShowUserMenu
   } = useDashboard();
 
+  const { user } = useAuth();
   const handleProfileSettings = () => {
     // Navigate to profile settings or open modal
     console.log('Opening profile settings...');
@@ -44,7 +46,7 @@ const Sidebar = () => {
         sidebarCollapsed={sidebarCollapsed}
       />
         <UserProfile 
-        userName="Admin User"
+        userName={user?.username || 'Guest'}
         onProfileSettings={handleProfileSettings}
         onLogout={handleLogout}
       />
