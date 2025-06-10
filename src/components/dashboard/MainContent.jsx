@@ -2,13 +2,10 @@ import { Bell } from 'lucide-react';
 import { useDashboard } from '../../context/DashboardContext';
 import Overview from '../overview/Overview';
 import CaseManagement from '../cases/CaseManagement';
-// import IncidentReports from '../reports/IncidentReports';
 import VictimDatabase from '../victims/VictimDatabase';
 import Analytics from '../analytics/Analytics';
 import Settings from '../settings/Settings';
-// import ReportsDashboard from '../reports/ReportsDashboard';
-import AdminReportModule from '../reports/AdminReportModule';
-import ReportForm from '../reports/ReportForm';
+import ReportsModule from '../reports/ReportsModule';
 
 const MainContent = () => {
   const { activeModule, menuItems } = useDashboard();
@@ -22,7 +19,7 @@ const MainContent = () => {
       case 'cases':
         return <CaseManagement />;
       case 'reports':
-        return <ReportForm />;
+        return <ReportsModule />;
       case 'victims':
         return <VictimDatabase />;
       case 'analytics':

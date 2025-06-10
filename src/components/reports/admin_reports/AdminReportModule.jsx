@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AlertCircle } from 'lucide-react';
-import { listReports } from '../../services/reportService';
+import { listReports } from '../../../services/reportService';
 import ReportCard from './ReportCard';
 import FilterPanel from './FilterPanel';
 import ReportDetailDialog from './ReportDetailDialog';
