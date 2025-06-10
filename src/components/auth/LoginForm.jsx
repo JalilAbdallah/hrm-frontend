@@ -1,21 +1,36 @@
 // src/components/auth/LoginForm.jsx
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AuthHeader from './AuthHeader';
 import InputField from '../common/InputField';
 import PasswordField from '../common/PasswordField';
 import CheckboxField from '../common/CheckboxField';
 import Button from '../common/Button';
+import {useAuth} from '../../context/AuthContext'; // Assuming you have an auth API module
 
 const LoginForm = ({ onSwitchToRegister }) => {
+  
+  const { isLoading, login } = useAuth(); // Custom hook to access auth context
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false
   });
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login submitted:', formData);
+    try {
+      const response = await login(formData);
+      console.log('Login successful:', response);
+      if (response.success) {
+        // Redirect to dashboard on successful login
+        navigate('/dashboard', { replace: true });
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   };
 
   const handleInputChange = (field) => (e) => {
@@ -74,6 +89,7 @@ const LoginForm = ({ onSwitchToRegister }) => {
             variant="primary"
             size="medium"
             className="w-full"
+            isLoading={isLoading} // Show loading state
           >
             Sign In
           </Button>

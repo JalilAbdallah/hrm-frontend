@@ -3,13 +3,15 @@ import SidebarHeader from './SidebarHeader';
 import SidebarNavigation from './SidebarNavigation';
 import UserProfile from './UserProfile';
 
-const Sidebar = ({ showUserMenu, setShowUserMenu }) => {
+const Sidebar = () => {
   const { 
     sidebarCollapsed, 
     setSidebarCollapsed, 
     activeModule, 
     setActiveModule, 
-    menuItems 
+    menuItems,
+    showUserMenu,
+    setShowUserMenu
   } = useDashboard();
 
   const handleProfileSettings = () => {
@@ -41,11 +43,7 @@ const Sidebar = ({ showUserMenu, setShowUserMenu }) => {
         setActiveModule={setActiveModule}
         sidebarCollapsed={sidebarCollapsed}
       />
-      
-      <UserProfile 
-        showUserMenu={showUserMenu}
-        setShowUserMenu={setShowUserMenu}
-        sidebarCollapsed={sidebarCollapsed}
+        <UserProfile 
         userName="Admin User"
         onProfileSettings={handleProfileSettings}
         onLogout={handleLogout}
