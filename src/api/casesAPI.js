@@ -14,10 +14,11 @@ import { CASES_ENDPOINTS } from '../config/constants.js';
  * @param {string} [options.date_from] - Filter cases created after this date (ISO format).
  * @param {string} [options.date_to] - Filter cases created before this date (ISO format).
  * @param {string} [options.violation_types] - Filter cases by violation types (comma-separated).
+ * @param {string} [endpoint] - The API endpoint to use (defaults to GET_CASES for active cases).
  **/
-export const fetchCasesWithPagination = async (current_skip = 1, current_limit = 15, options = {}) => {
+export const fetchCasesWithPagination = async (current_skip = 1, current_limit = 15, options = {}, endpoint = CASES_ENDPOINTS.GET_CASES) => {
   try {
-    let endpoint = CASES_ENDPOINTS.GET_CASES;
+    let apiEndpoint = endpoint;
     const queryParams = new URLSearchParams();
     queryParams.append('current_skip', current_skip);
     queryParams.append('current_limit', current_limit);
@@ -45,19 +46,18 @@ export const fetchCasesWithPagination = async (current_skip = 1, current_limit =
     }
     if (options.violation_types) {
       queryParams.append('violation_types', options.violation_types);
-    }
-    const queryString = queryParams.toString();
+    }    const queryString = queryParams.toString();
     if (queryString) {
-      endpoint += `?${queryString}`;
+      apiEndpoint += `?${queryString}`;
     }
     
-    console.log(`Fetching paginated cases from endpoint: ${endpoint}`);
-    const response = await apiFetch(endpoint);
+    console.log(`Fetching paginated cases from endpoint: ${apiEndpoint}`);
+    const response = await apiFetch(apiEndpoint);
 
     // Check if the response is successful and has the expected structure
-    if (response && response.success && Array.isArray(response.data) && response.pagination) {
+    if (response && Array.isArray(response.cases) && response.pagination) {
       return {
-        data: response.data,
+        data: response.cases,
         pagination: {
           total_count: response.pagination.total_count,
           current_skip: response.pagination.current_skip,
@@ -170,14 +170,16 @@ export const deleteCase = async (caseId) => {
   }
 };
 /**
- * Fetches all archived cases from the API.
- * @returns {Promise<Array>} - List of archived cases.
+ * Fetches archived cases with pagination and optional filters from the API.
+ * @param {number} current_skip - The number of records to skip (for pagination).
+ * @param {number} current_limit - The maximum number of records to return.
+ * @param {Object} [options={}] - Optional filters for the request.
+ * @returns {Promise<Object>} - Paginated list of archived cases.
  * @throws {Error} - Custom error with detailed message and status code.
  */
-export const fetchArchivedCases = async () => {
+export const fetchArchivedCases = async (current_skip = 0, current_limit = 15, options = {}) => {
   try {
-    const response = await apiFetch(CASES_ENDPOINTS.GET_ARCHIVED_CASES);
-    return response;
+    return await fetchCasesWithPagination(current_skip, current_limit, options, CASES_ENDPOINTS.GET_ARCHIVED_CASES);
   } catch (error) {
     throw new Error(`Failed to fetch archived cases: ${error.message}`, {
       cause: { status: error.status, details: error.details },
