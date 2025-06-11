@@ -6,6 +6,7 @@ import CaseHeader from './CaseHeader';
 import CaseFilters from './CaseFilters';
 import CaseGrid from './CaseGrid';
 import CaseModal from './CaseModal';
+import AddCaseModal from './AddCaseModal';
 import { set } from 'react-hook-form';
 
 
@@ -16,9 +17,9 @@ const CaseManagement = () => {
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedCase, setSelectedCase] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);  const [selectedCase, setSelectedCase] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [showArchived, setShowArchived] = useState(false); // Toggle between active and archived cases
   const [totalRecords, setTotalRecords] = useState(0);
   const [pagination, setPagination] = useState({
@@ -190,7 +191,18 @@ const CaseManagement = () => {
         console.error('Error restoring case:', error);
         // Show error message to user - you might want to add a toast notification here
       });
-    }
+  };
+
+  const handleCreateCase = (newCaseData) => {
+    // TODO: Replace with actual API call to create case
+    console.log('Creating new case:', newCaseData);
+    
+    // For now, we'll just simulate success and refresh the cases
+    // In the future, this should call an API endpoint like createCase(newCaseData)
+    
+    // Refresh the cases list to show the new case
+    fetchCases();
+  };
 
  
   const clearFilters = () => {
@@ -208,13 +220,13 @@ const CaseManagement = () => {
     fetchCases();
   };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
-      <CaseHeader 
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">      <CaseHeader 
         totalCases={totalCases}
         onShowFilters={() => setShowFilters(true)}
         userRole={userRole}
         showArchived={showArchived}
         onToggleArchived={handleToggleArchived}
+        onCreateCase={() => setShowAddModal(true)}
       />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -246,14 +258,18 @@ const CaseManagement = () => {
         onFiltersChange={setFilters}
         onApplyFilters={applyFilters}
         onClearFilters={clearFilters}
-      />
-
-      <CaseModal
+      />      <CaseModal
         visible={showModal}
         onHide={() => setShowModal(false)}
         caseData={selectedCase}
         onArchiveCase={handleArchiveCase}
         onRestoreCase={handleRestoreCase}
+      />
+
+      <AddCaseModal
+        visible={showAddModal}
+        onHide={() => setShowAddModal(false)}
+        onCreateCase={handleCreateCase}
       />
     </div>
   );

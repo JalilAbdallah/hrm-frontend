@@ -122,19 +122,18 @@ const CaseModal = ({ visible, onHide, caseData, onArchiveCase, onRestoreCase }) 
   return (
     <>
       <Toast ref={toast} />
-      <ConfirmPopup />
-      <Dialog
+      <ConfirmPopup />      <Dialog
         visible={visible}
         onHide={onHide}
         header={headerTemplate}
-        style={{ width: '90vw', maxWidth: '900px' }}
+        style={{ width: '90vw', maxWidth: '900px', maxHeight: '90vh' }}
         modal
         className="case-modal"
-        contentClassName="p-0"
+        contentClassName="p-0 overflow-hidden"
         headerClassName="pb-0"
       >
-        <div className="max-h-[70vh] overflow-y-auto">
-          <div className="p-6 space-y-6">
+        <div className="flex flex-col h-full">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Description Section */}
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">

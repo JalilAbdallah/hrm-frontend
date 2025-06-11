@@ -23,30 +23,14 @@ export const fetchCasesWithPagination = async (current_skip = 1, current_limit =
     queryParams.append('current_skip', current_skip);
     queryParams.append('current_limit', current_limit);
 
-    if (options.status) {
-      queryParams.append('status', options.status);
+    // Add query parameters from options
+    for (const [key, value] of Object.entries(options)) {
+      if (value !== undefined && value !== null && value !== '') {
+      queryParams.append(key, value);
+      }
     }
-    if (options.search) {
-      queryParams.append('search', options.search);
-    }
-    if (options.country) {
-      queryParams.append('country', options.country);
-    }
-    if (options.region) {
-      queryParams.append('region', options.region);
-    }
-    if (options.priority) {
-      queryParams.append('priority', options.priority);
-    }
-    if (options.date_from) {
-      queryParams.append('date_from', options.date_from);
-    }
-    if (options.date_to) {
-      queryParams.append('date_to', options.date_to);
-    }
-    if (options.violation_types) {
-      queryParams.append('violation_types', options.violation_types);
-    }    const queryString = queryParams.toString();
+    
+    const queryString = queryParams.toString();
     if (queryString) {
       apiEndpoint += `?${queryString}`;
     }
@@ -217,5 +201,19 @@ export const fetchCaseHistory = async (caseId) => {
       cause: { status: error.status, details: error.details },
     });
   }
+};
+
+export const createVictimsWaitlist = async (victims_data)=>{
+  try{
+    const response = await apiFetch(CASES_ENDPOINTS.CREATE_VICTIMS_WAITLIST, {
+      method: 'POST',
+      body: JSON.stringify(victims_data),
+    });
+    return response;
+  } catch (error) {
+      throw new Error(`Failed to create victims waitlist: ${error.message}`, {
+    cause: { status: error.status, details: error.details },
+      });
+    }
 };
 

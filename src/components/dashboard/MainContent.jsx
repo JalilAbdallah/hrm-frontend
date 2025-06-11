@@ -22,7 +22,7 @@ const MainContent = () => {
       case 'cases':
         return <CaseManagement />;
       case 'reports':
-        return <ReportForm />;
+        return <AdminReportModule />;
       case 'victims':
         return <VictimDatabase />;
       case 'analytics':

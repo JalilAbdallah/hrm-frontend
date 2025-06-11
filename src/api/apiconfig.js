@@ -44,40 +44,39 @@ export const apiFetch = async (endpoint, options = {}) => {
         errorMessage = `HTTP error! Status: ${response.status}`;
       }
 
-      // Handle specific HTTP status codes
-      switch (response.status) {
-        case 400:
-          throw new Error(`Bad Request: ${errorMessage}`, {
-            cause: { status: 400, details: errorData },
-          });
-        case 401:
-          localStorage.removeItem('authToken');
-          throw new Error('Unauthorized: Please log in again', {
-            cause: { status: 401, details: errorData },
-          });
-        case 403:
-          throw new Error(`Forbidden: You lack permission to access this resource`, {
-            cause: { status: 403, details: errorData },
-          });
-        case 404:
-          throw new Error(`Not Found: Resource at ${endpoint} does not exist`, {
-            cause: { status: 404, details: errorData },
-          });
-        case 429:
-          throw new Error(`Too Many Requests: Please try again later`, {
-            cause: { status: 429, details: errorData },
-          });
-        case 500:
-          throw new Error(`Server Error: Something went wrong on the server`, {
-            cause: { status: 500, details: errorData },
-          });
+    //   // Handle specific HTTP status codes
+    //   switch (response.status) {
+    //     case 400:
+    //       throw new Error(`Bad Request: ${errorMessage}`, {
+    //         cause: { status: 400, details: errorData },
+    //       });
+    //     case 401:
+    //       throw new Error('Unauthorized: Please log in again', {
+    //         cause: { status: 401, details: errorData },
+    //       });
+    //     case 403:
+    //       throw new Error(`Forbidden: You lack permission to access this resource`, {
+    //         cause: { status: 403, details: errorData },
+    //       });
+    //     case 404:
+    //       throw new Error(`Not Found: Resource at ${endpoint} does not exist`, {
+    //         cause: { status: 404, details: errorData },
+    //       });
+    //     case 429:
+    //       throw new Error(`Too Many Requests: Please try again later`, {
+    //         cause: { status: 429, details: errorData },
+    //       });
+    //     case 500:
+    //       throw new Error(`Server Error: Something went wrong on the server`, {
+    //         cause: { status: 500, details: errorData },
+    //       });
           
-        default:
-          throw new Error(errorMessage, {
-            cause: { status: response.status, details: errorData },
-          });
-      }
-    }
+    //     default:
+    //       throw new Error(errorMessage, {
+    //         cause: { status: response.status, details: errorData },
+    //       });
+    //   }
+     }
 
     // Parse successful response
     const data = await response.json();

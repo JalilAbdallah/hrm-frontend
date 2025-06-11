@@ -2,7 +2,7 @@ import React from 'react';
 import { Filter, Plus, Archive, FolderOpen } from 'lucide-react';
 import Button from '../common/Button'; // Updated import
 
-const CaseHeader = ({ totalCases, onShowFilters, userRole, showArchived, onToggleArchived }) => {
+const CaseHeader = ({ totalCases, onShowFilters, userRole, showArchived, onToggleArchived, onCreateCase }) => {
   const canCreateCase = userRole === 'admin' || userRole === 'investigator';
   return (
     <div className="bg-gradient-to-r from-white via-blue-50/50 to-indigo-50/50 border-b border-blue-100/60 shadow-xl relative overflow-hidden">
@@ -71,10 +71,9 @@ const CaseHeader = ({ totalCases, onShowFilters, userRole, showArchived, onToggl
                 </>
               )}
             </Button>
-          
             {canCreateCase && (
               <Button
-                onClick={() => console.log('Create new case')}
+                onClick={onCreateCase}
                 className="text-white font-bold px-8 py-3.5 rounded-2xl tracking-wide bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 flex items-center"
               >
                 <Plus className="w-4 h-4 mr-2" />
