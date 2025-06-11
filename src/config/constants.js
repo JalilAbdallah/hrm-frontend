@@ -19,6 +19,7 @@ export const CASES_ENDPOINTS = {
 export const ANALYTICS_ENDPOINTS = {
   GET_ANALYTICS: `/analytics/dashboard/`,
   GET_TRENDS: (date_from, date_to) => `/analytics/trends/?year_from=${date_from}&year_to=${date_to}`,
+  GET_TRENDS_BY_VIOLATION: (date_from, date_to, city, country) => `/analytics/violations/?year_from=${date_from}&year_to=${date_to}&city=${city}&country=${country}`,
 };
 
 export const STORAGE_KEYS = {

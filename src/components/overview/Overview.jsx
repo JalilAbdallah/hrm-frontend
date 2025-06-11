@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { fetchDashboardData, fetchTrendData } from '../../api/analyticsAPI';
 import StatusBreakdownDialog from './StatusBreakdownDialog';
 import ViolationTrendsChart from './ViolationTrendsChart';
+import ViolationsPieChart from './ViolationsPieChart';
 import GeoMapVisualization from './GeoMapVisualization';
 
 const Overview = () => {
