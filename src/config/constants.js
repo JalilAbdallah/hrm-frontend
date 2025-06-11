@@ -16,6 +16,11 @@ export const CASES_ENDPOINTS = {
   CREATE_VICTIMS_WAITLIST: '/cases/waitlist/'
 };
 
+export const ANALYTICS_ENDPOINTS = {
+  GET_ANALYTICS: `/analytics/dashboard/`,
+  GET_TRENDS: `/analytics/trends/`,
+};
+
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'authToken',
   AUTH_USER: 'authUser', // Added from AuthContext.jsx

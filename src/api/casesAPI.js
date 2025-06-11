@@ -16,7 +16,7 @@ import { CASES_ENDPOINTS } from '../config/constants.js';
  * @param {string} [options.violation_types] - Filter cases by violation types (comma-separated).
  * @param {string} [endpoint] - The API endpoint to use (defaults to GET_CASES for active cases).
  **/
-export const fetchCasesWithPagination = async (current_skip = 1, current_limit = 15, options = {}, endpoint = CASES_ENDPOINTS.GET_CASES) => {
+export const fetchCasesWithPagination = async (current_skip = 1, current_limit = 6, options = {}, endpoint = CASES_ENDPOINTS.GET_CASES) => {
   try {
     let apiEndpoint = endpoint;
     const queryParams = new URLSearchParams();

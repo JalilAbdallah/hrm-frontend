@@ -10,7 +10,7 @@ const SidebarNavItem = ({
     <li>
       <button
         onClick={() => onClick(item.id)}
-        className={`w-full flex items-center space-x-4 px-4 py-3 rounded-xl transition-all duration-200 group ${
+        className={`w-full flex items-center space-x-2 px-1 py-3 rounded-xl transition-all duration-200 group ${
           isActive 
             ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg' 
             : 'text-gray-700 hover:bg-gray-100 hover:text-blue-600'

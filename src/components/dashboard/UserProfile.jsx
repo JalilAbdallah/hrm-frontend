@@ -42,10 +42,7 @@ const UserProfile = ({
           isOpen={showUserMenu && !sidebarCollapsed} 
           onClose={() => setShowUserMenu(false)}
         >
-          <DropdownItem onClick={handleProfileSettings}>
-            <Settings size={16} className="text-gray-500" />
-            <span className="text-sm">Profile Settings</span>
-          </DropdownItem>
+       
           <hr className="my-1" />
           <DropdownItem onClick={handleLogout} variant="danger">
             <LogOut size={16} />

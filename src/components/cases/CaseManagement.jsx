@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDashboard } from '../../context/DashboardContext';
-import { Paginator } from 'primereact/paginator';
 import { fetchCasesWithPagination, fetchArchivedCases, deleteCase, restoreCase } from '../../api/casesAPI';
 import CaseHeader from './CaseHeader';
 import CaseFilters from './CaseFilters';
 import CaseGrid from './CaseGrid';
 import CaseModal from './CaseModal';
 import AddCaseModal from './AddCaseModal';
-import { set } from 'react-hook-form';
 
 
 const CaseManagement = () => {
@@ -16,20 +14,11 @@ const CaseManagement = () => {
   // State management
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
   const [showFilters, setShowFilters] = useState(false);  const [selectedCase, setSelectedCase] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showArchived, setShowArchived] = useState(false); // Toggle between active and archived cases
-  const [totalRecords, setTotalRecords] = useState(0);
-  const [pagination, setPagination] = useState({
-    total_count: 0,
-    current_skip: 0,
-    current_limit: 6,
-    has_next: false,
-    has_prev: false
-  });
-    const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState({
     violationType: "",
     country: "",
     region: "",
@@ -40,11 +29,10 @@ const CaseManagement = () => {
     search: "" // Search by title
   });
 
-  const casesPerPage = 6;  // Fetch cases from backend
+  // Fetch cases from backend
   const fetchCases = async () => {
     setLoading(true);
     try {
-      const skip = currentPage * casesPerPage;
       const apiFilters = {};
       
       // Map filters to API parameters
@@ -58,8 +46,10 @@ const CaseManagement = () => {
       if (filters.dateTo) apiFilters.date_to = filters.dateTo;      
       let response;
       if (showArchived) {
-        // Fetch archived cases with pagination
-        response = await fetchArchivedCases(skip, casesPerPage, apiFilters);        // Map the archived cases data to match the expected format
+        // Fetch archived cases
+        response = await fetchArchivedCases(undefined, undefined, apiFilters); // Pass undefined for skip and limit
+        console.log('API Response (Archived):', response); 
+        // Map the archived cases data to match the expected format
         const mappedCases = (response.data || []).map(caseItem => ({
           _id: caseItem._id,
           case_id: caseItem.case_id, // Add case_id for CaseCard component
@@ -79,17 +69,11 @@ const CaseManagement = () => {
           created_by: caseItem.created_by
         }));
         setCases(mappedCases);
-        setPagination(response.pagination || {
-          total_count: 0,
-          current_skip: 0,
-          current_limit: casesPerPage,
-          has_next: false,
-          has_prev: false
-        });
-        setTotalRecords(response.pagination?.total_count || 0);
       } else {
-        // Fetch active cases with pagination
-        response = await fetchCasesWithPagination(skip, casesPerPage, apiFilters);        // Map the active cases data to match the expected format
+        // Fetch active cases
+        response = await fetchCasesWithPagination(undefined, undefined, apiFilters); // Pass undefined for skip and limit
+        console.log('API Response (Active):', response); 
+        // Map the active cases data to match the expected format
         const mappedCases = (response.data || []).map(caseItem => ({
           _id: caseItem._id,
           case_id: caseItem.case_id, // Add case_id for CaseCard component
@@ -109,28 +93,12 @@ const CaseManagement = () => {
           created_by: caseItem.created_by
         }));
         setCases(mappedCases);
-        setPagination(response.pagination || {
-          total_count: 0,
-          current_skip: 0,
-          current_limit: casesPerPage,
-          has_next: false,
-          has_prev: false
-        });
-        setTotalRecords(response.pagination?.total_count || 0);
       }
       
     } catch (error) {
       console.error('Error fetching cases:', error);
       // Show error message to user - you might want to add a toast notification here
       setCases([]);
-      setPagination({
-        total_count: 0,
-        current_skip: 0,
-        current_limit: casesPerPage,
-        has_next: false,
-        has_prev: false
-      });
-      setTotalRecords(0);
     } finally {
       setLoading(false);
     }
@@ -139,26 +107,17 @@ const CaseManagement = () => {
   // Fetch cases when component mounts or when filters/pagination changes
   useEffect(() => {
     fetchCases();
-  }, [currentPage, showArchived]); // Remove filters from dependency to prevent auto-fetch
+  }, [showArchived]); // Removed currentPage and filters from dependency
 
   // Manual filter application
   const applyFilters = () => {
-    setCurrentPage(0); // Reset to first page
     fetchCases();
   };
 
-  // Filter cases based on applied filters (for client-side filtering if needed)
-  // const filteredCases = cases;
-  const totalCases = pagination.total_count;
-  // const totalPages = Math.ceil(totalCases / casesPerPage);
-
-  const onPageChange = (event) => {
-    setCurrentPage(event.page);
-  };
+  const totalCases = cases.length; // Use cases.length for total cases
 
   const handleToggleArchived = () => {
     setShowArchived(!showArchived);
-    setCurrentPage(0); // Reset to first page when switching
   };
 
   const handleCaseClick = (caseData) => {
@@ -216,11 +175,11 @@ const CaseManagement = () => {
       dateTo: "",
       search: ""
     });
-    setCurrentPage(0);
     fetchCases();
   };
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">      <CaseHeader 
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">      
+    <CaseHeader 
         totalCases={totalCases}
         onShowFilters={() => setShowFilters(true)}
         userRole={userRole}
@@ -236,19 +195,6 @@ const CaseManagement = () => {
           onCaseClick={handleCaseClick}
         />
         
-        {totalCases > casesPerPage && (
-          <div className="mt-8 flex justify-center">
-            <Paginator
-              first={currentPage * casesPerPage}
-              rows={casesPerPage}
-              totalRecords={totalCases}
-              onPageChange={onPageChange}
-              template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} cases"
-              className="bg-white rounded-lg border border-blue-100 shadow-sm"
-            />
-          </div>
-        )}
       </div>
       
       <CaseFilters
