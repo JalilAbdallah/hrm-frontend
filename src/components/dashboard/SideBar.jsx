@@ -47,7 +47,6 @@ const Sidebar = () => {
       />
         <UserProfile 
         userName={user?.username || 'Guest'}
-        onProfileSettings={handleProfileSettings}
         onLogout={handleLogout}
       />
       

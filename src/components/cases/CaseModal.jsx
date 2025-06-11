@@ -3,12 +3,13 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
 import { Toast } from 'primereact/toast';
-import { MapPin, Users, AlertTriangle, Calendar, Clock, User, FileText, Archive, ExternalLink } from 'lucide-react';
+import { MapPin, Users, AlertTriangle, Calendar, Clock, User, FileText, Archive, ExternalLink, RotateCcw } from 'lucide-react';
 
 const statusColors = {
   under_investigation: "bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border-amber-200",
   active: "bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-800 border-emerald-200",
   closed: "bg-gradient-to-r from-slate-100 to-gray-100 text-slate-800 border-slate-200",
+  archived: "bg-gradient-to-r from-gray-100 to-red-100 text-red-800 border-red-200",
 };
 
 const priorityColors = {
@@ -18,7 +19,7 @@ const priorityColors = {
   low: "bg-gradient-to-r from-gray-400 to-slate-400 text-white",
 };
 
-const CaseModal = ({ visible, onHide, caseData, onArchiveCase }) => {
+const CaseModal = ({ visible, onHide, caseData, onArchiveCase, onRestoreCase }) => {
   const toast = useRef(null);
 
   const formatDate = (dateString) => {
@@ -35,7 +36,6 @@ const CaseModal = ({ visible, onHide, caseData, onArchiveCase }) => {
     if (!victims || victims.length === 0) return 0;
     return victims.reduce((total, victim) => total + (victim.count || 1), 0);
   };
-
   const confirmArchive = (event) => {
     confirmPopup({
       target: event.currentTarget,
@@ -58,6 +58,34 @@ const CaseModal = ({ visible, onHide, caseData, onArchiveCase }) => {
           severity: 'info',
           summary: 'Archive Cancelled',
           detail: 'Case archive operation was cancelled.',
+          life: 3000
+        });
+      }
+    });
+  };
+
+  const confirmRestore = (event) => {
+    confirmPopup({
+      target: event.currentTarget,
+      message: 'Are you sure you want to restore this case? The case will be moved back to active status.',
+      header: 'Restore Case Confirmation',
+      icon: 'pi pi-question-circle',
+      acceptClassName: 'p-button-success',
+      accept: () => {
+        onRestoreCase(caseData._id);
+        toast.current.show({
+          severity: 'success',
+          summary: 'Case Restored',
+          detail: `Case ${caseData.case_id} has been successfully restored.`,
+          life: 3000
+        });
+        onHide();
+      },
+      reject: () => {
+        toast.current.show({
+          severity: 'info',
+          summary: 'Restore Cancelled',
+          detail: 'Case restore operation was cancelled.',
           life: 3000
         });
       }
@@ -94,19 +122,18 @@ const CaseModal = ({ visible, onHide, caseData, onArchiveCase }) => {
   return (
     <>
       <Toast ref={toast} />
-      <ConfirmPopup />
-      <Dialog
+      <ConfirmPopup />      <Dialog
         visible={visible}
         onHide={onHide}
         header={headerTemplate}
-        style={{ width: '90vw', maxWidth: '900px' }}
+        style={{ width: '90vw', maxWidth: '900px', maxHeight: '90vh' }}
         modal
         className="case-modal"
-        contentClassName="p-0"
+        contentClassName="p-0 overflow-hidden"
         headerClassName="pb-0"
       >
-        <div className="max-h-[70vh] overflow-y-auto">
-          <div className="p-6 space-y-6">
+        <div className="flex flex-col h-full">
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Description Section */}
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -249,9 +276,7 @@ const CaseModal = ({ visible, onHide, caseData, onArchiveCase }) => {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Footer with Archive Button */}
+        </div>        {/* Footer with Archive/Restore Button */}
         <div className="flex justify-between items-center p-6 border-t border-gray-200 bg-gray-50">
           <div className="text-sm text-gray-600">
             Case ID: {caseData.case_id}
@@ -263,13 +288,23 @@ const CaseModal = ({ visible, onHide, caseData, onArchiveCase }) => {
               onClick={onHide}
               className="p-button-outlined"
             />
-            <Button
-              label="Archive Case"
-              icon="pi pi-archive"
-              onClick={confirmArchive}
-              className="p-button-danger"
-              severity="danger"
-            />
+            {caseData.status === 'archived' ? (
+              <Button
+                label="Restore Case"
+                icon={() => <RotateCcw className="w-4 h-4" />}
+                onClick={confirmRestore}
+                className="p-button-success"
+                severity="success"
+              />
+            ) : (
+              <Button
+                label="Archive Case"
+                icon="pi pi-archive"
+                onClick={confirmArchive}
+                className="p-button-danger"
+                severity="danger"
+              />
+            )}
           </div>
         </div>
       </Dialog>

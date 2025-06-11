@@ -12,7 +12,13 @@ export const CASES_ENDPOINTS = {
   DELETE_CASE: (case_id) => `/cases/${case_id}`,
   GET_ARCHIVED_CASES: `/cases/archive/`,
   GET_ARCHIVED_CASE_BY_ID: (case_id) => `/cases/archive/${case_id}`,
-  GET_CASE_HISTORY: (case_id) => `/cases/history/${case_id}`
+  GET_CASE_HISTORY: (case_id) => `/cases/history/${case_id}`,
+  CREATE_VICTIMS_WAITLIST: '/cases/waitlist/'
+};
+
+export const ANALYTICS_ENDPOINTS = {
+  GET_ANALYTICS: `/analytics/dashboard/`,
+  GET_TRENDS: `/analytics/trends/`,
 };
 
 export const STORAGE_KEYS = {

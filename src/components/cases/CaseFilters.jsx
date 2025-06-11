@@ -2,72 +2,25 @@ import React from 'react';
 import { Sidebar } from 'primereact/sidebar';
 import { Dropdown } from 'primereact/dropdown';
 import { Calendar } from 'primereact/calendar';
+import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Divider } from 'primereact/divider';
-import { Filter, X } from 'lucide-react';
+import { Filter, X, Search } from 'lucide-react';
+import { 
+  violationTypes, 
+  countries, 
+  regions, 
+  statuses, 
+  priorities, 
+  getFilterLabel 
+} from '../../config/filterOptions';
 
-const violationTypes = [
-  { label: "Attack on Medical", value: "attack_on_medical" },
-  { label: "War Crimes", value: "war_crimes" },
-  { label: "Torture", value: "torture" },
-  { label: "Arbitrary Detention", value: "arbitrary_detention" },
-  { label: "Attack on Civilians", value: "attack_on_civilians" },
-  { label: "Forced Displacement", value: "forced_displacement" },
-  { label: "Crimes Against Humanity", value: "crimes_against_humanity" },
-  { label: "Chemical Weapons", value: "chemical_weapons" },
-];
-
-const countries = [
-  { label: "Syria", value: "Syria" },
-  { label: "Iraq", value: "Iraq" },
-  { label: "Yemen", value: "Yemen" },
-  { label: "Lebanon", value: "Lebanon" },
-];
-
-const regions = [
-  { label: "North-West", value: "North-West" },
-  { label: "Damascus", value: "Damascus" },
-  { label: "Aleppo", value: "Aleppo" },
-  { label: "Daraa", value: "Daraa" },
-  { label: "Idlib", value: "Idlib" },
-  { label: "Homs", value: "Homs" },
-  { label: "Hama", value: "Hama" },
-];
-
-const statuses = [
-  { label: "Under Investigation", value: "under_investigation" },
-  { label: "Active", value: "active" },
-  { label: "Closed", value: "closed" },
-];
-
-const priorities = [
-  { label: "Critical", value: "critical" },
-  { label: "High", value: "high" },
-  { label: "Medium", value: "medium" },
-  { label: "Low", value: "low" },
-];
-
-const CaseFilters = ({ visible, onHide, filters, onFiltersChange, onClearFilters }) => {
+const CaseFilters = ({ visible, onHide, filters, onFiltersChange, onApplyFilters, onClearFilters }) => {
   const updateFilter = (key, value) => {
     onFiltersChange({ ...filters, [key]: value });
   };
-
   // Count active filters
   const activeFilterCount = Object.entries(filters).filter(([key, value]) => value && value !== "").length;
-  
-  // Get filter statistics
-  const getFilterLabel = (key, value) => {
-    const labelMap = {
-      violationType: violationTypes.find(v => v.value === value)?.label || value,
-      country: countries.find(c => c.value === value)?.label || value,
-      region: regions.find(r => r.value === value)?.label || value,
-      status: statuses.find(s => s.value === value)?.label || value,
-      priority: priorities.find(p => p.value === value)?.label || value,
-      dateFrom: value,
-      dateTo: value
-    };
-    return labelMap[key] || value;
-  };
 
 return (
     <Sidebar 
@@ -142,9 +95,29 @@ return (
                         )}
                     </div>
                 </div>
+            </div>            {/* Filter Sections */}
+            {/* Search Field */}
+            <div className="bg-gradient-to-br from-white via-blue-50/40 to-indigo-50/40 rounded-3xl p-8 border-3 border-blue-100/80 shadow-2xl backdrop-blur-sm transition-all duration-300">
+                <label className="block text-base font-bold text-gray-800 mb-5 flex items-center gap-4">
+                    <div className="w-4 h-4 bg-gradient-to-br from-green-500 to-green-700 rounded-2xl flex items-center justify-center shadow-xl transition-transform duration-300">
+                        <Search className="w-2 h-2 text-white" />
+                    </div>
+                    <span className="bg-gradient-to-r from-gray-800 to-gray-700 bg-clip-text text-transparent">Search by Title</span>
+                </label>
+                <InputText
+                    value={filters.search}
+                    onChange={(e) => updateFilter('search', e.target.value)}
+                    placeholder="Enter case title to search..."
+                    className="w-full enhanced-input transition-all duration-200"
+                    style={{ 
+                        borderRadius: '1rem', 
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
+                        padding: '1rem 1.5rem',
+                        fontSize: '1rem'
+                    }}
+                />
             </div>
 
-            {/* Filter Sections */}
             {[
                 { key: 'violationType', label: 'Violation Type', options: violationTypes, color: 'from-blue-500 to-blue-700' },
                 { key: 'country', label: 'Country', options: countries, color: 'from-emerald-500 to-emerald-700' },
@@ -252,12 +225,14 @@ return (
                             <span className="text-sm text-gray-600 font-semibold">No filters to clear</span>
                         </div>
                     )}
-                </div>
-
+                </div>                
                 <div className="relative transition-all duration-300">
                     <Button
                         label={`Apply Filters ${activeFilterCount > 0 ? `(${activeFilterCount})` : ''}`}
-                        onClick={onHide} // This will close the sidebar, effectively applying filters
+                        onClick={() => {
+                            onApplyFilters();
+                            onHide();
+                        }}
                         className="w-full enhanced-apply-button"
                         icon={() => <Filter className="w-5 h-5 transition-transform duration-300" />}
                         pt={{
@@ -280,10 +255,7 @@ return (
                             }
                         }}
                     />
-                     <div 
-                        className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-700 rounded-2xl opacity-30 blur-md group-hover:opacity-50 transition-opacity duration-300"
-                        style={{ animationDuration: '3s' }}
-                    ></div>
+                    
                 </div>
             </div>
         </div>

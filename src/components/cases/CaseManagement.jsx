@@ -1,137 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useDashboard } from '../../context/DashboardContext';
-import { Paginator } from 'primereact/paginator';
+import { fetchCasesWithPagination, fetchArchivedCases, deleteCase, restoreCase } from '../../api/casesAPI';
 import CaseHeader from './CaseHeader';
 import CaseFilters from './CaseFilters';
 import CaseGrid from './CaseGrid';
 import CaseModal from './CaseModal';
+import AddCaseModal from './AddCaseModal';
 
-// Mock data based on the structure
-const mockCases = [
-  {
-    _id: "6637238330071187944c6423",
-    case_id: "HRM-2024-4901",
-    title: "North-West Syria Medical Attack",
-    description: "Coordinated attacks on clinics and ambulances in Idlib and Hama governorates",
-    violation_types: ["attack_on_medical", "war_crimes"],
-    status: "under_investigation",
-    priority: "high",
-    location: {
-      country: "Syria",
-      region: "North-West",
-      coordinates: { type: "Point", coordinates: [36, 36] },
-    },
-    victims: [],
-    perpetrators: [
-      {
-        entity_name: "4th Armored Division",
-        type: "state_security_apparatus",
-      },
-    ],
-    created_at: "Wed May 28 2025 17:53:54 GMT+0300",
-    updated_at: "Wed May 28 2025 17:53:54 GMT+0300",
-  },
-  {
-    _id: "6637238330071187944c6424",
-    case_id: "HRM-2024-4902",
-    title: "Detention Center Violations",
-    description: "Reports of torture and inhumane conditions in detention facilities",
-    violation_types: ["torture", "arbitrary_detention"],
-    status: "active",
-    priority: "high",
-    location: {
-      country: "Syria",
-      region: "Damascus",
-      coordinates: { type: "Point", coordinates: [33.5, 36.3] },
-    },
-    victims: [{ count: 15 }],
-    perpetrators: [
-      {
-        entity_name: "Military Intelligence",
-        type: "state_security_apparatus",
-      },
-    ],
-    created_at: "Wed May 27 2025 14:22:10 GMT+0300",
-    updated_at: "Wed May 28 2025 09:15:33 GMT+0300",
-  },
-  {
-    _id: "6637238330071187944c6425",
-    case_id: "HRM-2024-4903",
-    title: "Civilian Infrastructure Attack",
-    description: "Bombing of schools and residential areas in Aleppo province",
-    violation_types: ["attack_on_civilians", "war_crimes", "marco_polo", "pretty_little_baby"],
-    status: "closed",
-    priority: "medium",
-    location: {
-      country: "Syria",
-      region: "Aleppo",
-      coordinates: { type: "Point", coordinates: [36.2, 37.1] },
-    },
-    victims: [{ count: 8 }],
-    perpetrators: [
-      {
-        entity_name: "Syrian Air Force",
-        type: "state_military",
-      },
-    ],
-    created_at: "Wed May 25 2025 11:45:22 GMT+0300",
-    updated_at: "Wed May 26 2025 16:30:15 GMT+0300",
-  },
-  {
-    _id: "6637238330071187944c6426",
-    case_id: "HRM-2024-4904",
-    title: "Forced Displacement Operations",
-    description: "Systematic displacement of civilians from opposition-held areas",
-    violation_types: ["forced_displacement", "crimes_against_humanity"],
-    status: "under_investigation",
-    priority: "high",
-    location: {
-      country: "Syria",
-      region: "Daraa",
-      coordinates: { type: "Point", coordinates: [32.6, 36.1] },
-    },
-    victims: [{ count: 250 }],
-    perpetrators: [
-      {
-        entity_name: "5th Corps",
-        type: "state_military",
-      },
-    ],
-    created_at: "Wed May 24 2025 08:12:45 GMT+0300",
-    updated_at: "Wed May 27 2025 13:22:18 GMT+0300",
-  },
-  {
-    _id: "6637238330071187944c6427",
-    case_id: "HRM-2024-4905",
-    title: "Chemical Weapons Usage",
-    description: "Alleged use of chlorine gas in residential areas",
-    violation_types: ["chemical_weapons", "war_crimes"],
-    status: "active",
-    priority: "critical",
-    location: {
-      country: "Syria",
-      region: "Idlib",
-      coordinates: { type: "Point", coordinates: [35.9, 36.6] },
-    },
-    victims: [{ count: 32 }],
-    perpetrators: [
-      {
-        entity_name: "Syrian Air Force",
-        type: "state_military",
-      },
-    ],
-    created_at: "Wed May 23 2025 19:33:12 GMT+0300",
-    updated_at: "Wed May 28 2025 10:45:27 GMT+0300",
-  },
-];
 
 const CaseManagement = () => {
-  const { userRole } = useDashboard();  const [cases, setCases] = useState(mockCases);
+  const { userRole } = useDashboard();
+  
+  // State management
+  const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [showFilters, setShowFilters] = useState(false);
-  const [selectedCase, setSelectedCase] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);  const [selectedCase, setSelectedCase] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showArchived, setShowArchived] = useState(false); // Toggle between active and archived cases
   const [filters, setFilters] = useState({
     violationType: "",
     country: "",
@@ -140,39 +26,98 @@ const CaseManagement = () => {
     priority: "",
     dateFrom: "",
     dateTo: "",
+    search: "" // Search by title
   });
 
-  const casesPerPage = 6;
+  // Fetch cases from backend
+  const fetchCases = async () => {
+    setLoading(true);
+    try {
+      const apiFilters = {};
+      
+      // Map filters to API parameters
+      if (filters.search) apiFilters.search = filters.search;
+      if (filters.violationType) apiFilters.violation_types = filters.violationType;
+      if (filters.country) apiFilters.country = filters.country;
+      if (filters.region) apiFilters.region = filters.region;
+      if (filters.status) apiFilters.status = filters.status;
+      if (filters.priority) apiFilters.priority = filters.priority;
+      if (filters.dateFrom) apiFilters.date_from = filters.dateFrom;
+      if (filters.dateTo) apiFilters.date_to = filters.dateTo;      
+      let response;
+      if (showArchived) {
+        // Fetch archived cases
+        response = await fetchArchivedCases(undefined, undefined, apiFilters); // Pass undefined for skip and limit
+        console.log('API Response (Archived):', response); 
+        // Map the archived cases data to match the expected format
+        const mappedCases = (response.data || []).map(caseItem => ({
+          _id: caseItem._id,
+          case_id: caseItem.case_id, // Add case_id for CaseCard component
+          title: caseItem.title,
+          description: caseItem.description,
+          violation_types: Array.isArray(caseItem.violation_types) ? caseItem.violation_types : [caseItem.violation_types],
+          priority: caseItem.priority,
+          status: 'archived',
+          location: caseItem.location || {},
+          victims: Array.isArray(caseItem.victims) ? caseItem.victims : (caseItem.victims ? [caseItem.victims] : []),
+          perpetrators: (caseItem.perpetrators || []).map(perp => ({
+            ...perp,
+            entity_type: perp.type // Map type to entity_type if needed
+          })),
+          created_at: caseItem.created_at,
+          updated_at: caseItem.updated_at,
+          created_by: caseItem.created_by
+        }));
+        setCases(mappedCases);
+      } else {
+        // Fetch active cases
+        response = await fetchCasesWithPagination(undefined, undefined, apiFilters); // Pass undefined for skip and limit
+        console.log('API Response (Active):', response); 
+        // Map the active cases data to match the expected format
+        const mappedCases = (response.data || []).map(caseItem => ({
+          _id: caseItem._id,
+          case_id: caseItem.case_id, // Add case_id for CaseCard component
+          title: caseItem.title,
+          description: caseItem.description,
+          violation_types: Array.isArray(caseItem.violation_types) ? caseItem.violation_types : [caseItem.violation_types],
+          priority: caseItem.priority,
+          status: caseItem.status || 'active',
+          location: caseItem.location || {},
+          victims: Array.isArray(caseItem.victims) ? caseItem.victims : (caseItem.victims ? [caseItem.victims] : []),
+          perpetrators: (caseItem.perpetrators || []).map(perp => ({
+            ...perp,
+            entity_type: perp.type || perp.entity_type // Map type to entity_type if needed
+          })),
+          created_at: caseItem.created_at,
+          updated_at: caseItem.updated_at,
+          created_by: caseItem.created_by
+        }));
+        setCases(mappedCases);
+      }
+      
+    } catch (error) {
+      console.error('Error fetching cases:', error);
+      // Show error message to user - you might want to add a toast notification here
+      setCases([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // Filter cases based on applied filters
-  const filteredCases = cases.filter(caseItem => {
-    let matches = true;
-    
-    if (filters.violationType && !caseItem.violation_types.includes(filters.violationType)) {
-      matches = false;
-    }
-    if (filters.country && caseItem.location.country !== filters.country) {
-      matches = false;
-    }
-    if (filters.region && caseItem.location.region !== filters.region) {
-      matches = false;
-    }
-    if (filters.status && caseItem.status !== filters.status) {
-      matches = false;
-    }
-    if (filters.priority && caseItem.priority !== filters.priority) {
-      matches = false;
-    }
-    
-    return matches;
-  });
-  const totalCases = filteredCases.length;
-  const totalPages = Math.ceil(totalCases / casesPerPage);
-  const startIndex = currentPage * casesPerPage;
-  const endIndex = startIndex + casesPerPage;
-  const currentCases = filteredCases.slice(startIndex, endIndex);
-  const onPageChange = (event) => {
-    setCurrentPage(event.page);
+  // Fetch cases when component mounts or when filters/pagination changes
+  useEffect(() => {
+    fetchCases();
+  }, [showArchived]); // Removed currentPage and filters from dependency
+
+  // Manual filter application
+  const applyFilters = () => {
+    fetchCases();
+  };
+
+  const totalCases = cases.length; // Use cases.length for total cases
+
+  const handleToggleArchived = () => {
+    setShowArchived(!showArchived);
   };
 
   const handleCaseClick = (caseData) => {
@@ -181,67 +126,96 @@ const CaseManagement = () => {
   };
 
   const handleArchiveCase = (caseId) => {
-    // Update the case status to archived or remove from the list
-    setCases(prevCases => 
-      prevCases.map(caseItem => 
-        caseItem._id === caseId 
-          ? { ...caseItem, status: 'archived' }
-          : caseItem
-      )
-    );
+    deleteCase(caseId)
+      .then(() => {
+        // Optionally, you can show a success message here
+        console.log(`Case ${caseId} archived successfully`);
+        setShowArchived(true); // Switch to archived cases view
+        // Update the local state to reflect the archived status
+      })
+      .catch(error => {
+        console.error('Error archiving case:', error);
+        // Show error message to user - you might want to add a toast notification here
+      });
   };
 
+  const handleRestoreCase = (caseId) => {
+    restoreCase(caseId)
+      .then(() => { 
+        // Optionally, you can show a success message here
+        console.log(`Case ${caseId} restored successfully`);
+        setShowArchived(false); // Switch back to active cases view
+      })
+      .catch(error => {
+        console.error('Error restoring case:', error);
+        // Show error message to user - you might want to add a toast notification here
+      });
+  };
+
+  const handleCreateCase = (newCaseData) => {
+    // TODO: Replace with actual API call to create case
+    console.log('Creating new case:', newCaseData);
+    
+    // For now, we'll just simulate success and refresh the cases
+    // In the future, this should call an API endpoint like createCase(newCaseData)
+    
+    // Refresh the cases list to show the new case
+    fetchCases();
+  };
+
+ 
   const clearFilters = () => {
     setFilters({
       violationType: "",
       country: "",
       region: "",
       status: "",
-      priority: "",      dateFrom: "",
+      priority: "",
+      dateFrom: "",
       dateTo: "",
+      search: ""
     });
-    setCurrentPage(0);
+    fetchCases();
   };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
-      <CaseHeader 
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">      
+    <CaseHeader 
         totalCases={totalCases}
         onShowFilters={() => setShowFilters(true)}
         userRole={userRole}
-      />        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        showArchived={showArchived}
+        onToggleArchived={handleToggleArchived}
+        onCreateCase={() => setShowAddModal(true)}
+      />
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <CaseGrid 
-          cases={currentCases} 
+          cases={cases} 
           loading={loading} 
           onCaseClick={handleCaseClick}
         />
         
-        {totalCases > casesPerPage && (
-          <div className="mt-8 flex justify-center">
-            <Paginator
-              first={currentPage * casesPerPage}
-              rows={casesPerPage}
-              totalRecords={totalCases}
-              onPageChange={onPageChange}
-              template="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} cases"
-              className="bg-white rounded-lg border border-blue-100 shadow-sm"
-            />
-          </div>
-        )}
-      </div>      <CaseFilters
+      </div>
+      
+      <CaseFilters
         visible={showFilters}
         onHide={() => setShowFilters(false)}
         filters={filters}
         onFiltersChange={setFilters}
+        onApplyFilters={applyFilters}
         onClearFilters={clearFilters}
-      />
-
-      <CaseModal
+      />      <CaseModal
         visible={showModal}
         onHide={() => setShowModal(false)}
         caseData={selectedCase}
         onArchiveCase={handleArchiveCase}
+        onRestoreCase={handleRestoreCase}
+      />
+
+      <AddCaseModal
+        visible={showAddModal}
+        onHide={() => setShowAddModal(false)}
+        onCreateCase={handleCreateCase}
       />
     </div>
   );

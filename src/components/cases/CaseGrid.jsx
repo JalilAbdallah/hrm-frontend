@@ -17,7 +17,7 @@ const CaseGrid = ({ cases, loading, onCaseClick }) => {  if (loading) {
   if (cases.length === 0) {
     return (
       <div className="text-center py-16">
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-12 border border-blue-100">
+        <div className="bg-white rounded-2xl p-12 border border-blue-100">
           <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <FileText className="h-10 w-10 text-blue-600" />
           </div>

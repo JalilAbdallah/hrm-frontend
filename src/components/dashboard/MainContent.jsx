@@ -40,12 +40,7 @@ const MainContent = () => {
               {activeItem?.label || 'Dashboard'}
             </h1>
             <div className="flex items-center space-x-4">
-              <button className="relative p-3 rounded-xl hover:bg-gray-100 transition-colors">
-                <Bell size={20} className="text-gray-600" />
-                <span className="absolute -top-1 -right-1 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
-                3
-              </span>
-              </button>
+             
               <div className="h-8 w-px bg-gray-300"></div>
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">Today</p>

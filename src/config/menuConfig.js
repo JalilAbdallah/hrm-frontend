@@ -14,7 +14,7 @@ export const menuItems = [
     id: 'cases',
     label: 'Case Management',
     icon: FileText,
-    role: 'all',
+    role: 'admin',
     component: 'CaseManagement',
     description: 'Manage and track cases'
   },
@@ -38,24 +38,16 @@ export const menuItems = [
     id: 'analytics',
     label: 'Data Analytics',
     icon: BarChart3,
-    role: 'all',
+    role: 'admin',
     component: 'Analytics',
     description: 'Data insights and analytics'
   },
-  {
-    id: 'settings',
-    label: 'Settings',
-    icon: Settings,
-    role: 'admin',
-    component: 'Settings',
-    description: 'System settings and configuration'
-  }
+ 
 ];
 
 export const userRoles = {
   ADMIN: 'admin',
-  USER: 'user',
-  VIEWER: 'viewer'
+  INSTITUTION: 'institution',
 };
 
 export const defaultSettings = {

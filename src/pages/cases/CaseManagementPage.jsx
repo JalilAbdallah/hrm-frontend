@@ -1,5 +1,5 @@
 import React from 'react';
-import CaseManagement from '../components/cases/CaseManagement';
+import CaseManagement from '../../components/cases/CaseManagement';
 
 const CaseManagementPage = () => {
   return <CaseManagement />;
