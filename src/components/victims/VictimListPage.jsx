@@ -1,7 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import VictimCard from './VictimCard';
 import AddVictimModal from './AddVictimModal';
-import {listWaitingVictims, updateVictimListByCase} from '../../services/victimsService';
+import { listWaitingVictims, updateVictimListByCase } from '../../services/victimsService';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 
 const VictimListPage = () => {
     const [victims, setVictims] = useState([]);
@@ -35,15 +36,23 @@ const VictimListPage = () => {
     };
 
     const handleDelete = async (victim) => {
-        const remainingVictims = victims.filter(v => v.parent_id === victim.parent_id);
-        const updatedList = remainingVictims.filter(v => v.name !== victim.name);
+        const updatedList = victims
+            .filter(v => v.parent_id === victim.parent_id && v._id !== victim._id);
         await updateVictimListByCase(victim.case_id, updatedList);
+        setVictims(prev => prev.filter(v => v._id !== victim._id));
+    };
+
+    const handleModalClose = async () => {
+        setShowModal(false);
+        setSelectedVictim(null);
         await fetchVictims();
     };
 
     return (
         <div className="max-w-6xl mx-auto p-6">
             <h2 className="text-2xl font-bold mb-4 text-gray-800">Victims Awaiting Review</h2>
+
+            <ConfirmDialog /> {/* Add single ConfirmDialog instance here */}
 
             {victims.length === 0 ? (
                 <p className="text-gray-600">No victims found.</p>
@@ -63,11 +72,9 @@ const VictimListPage = () => {
             {selectedVictim && (
                 <AddVictimModal
                     visible={showModal}
-                    onHide={() => {
-                        setShowModal(false);
-                        setSelectedVictim(null);
-                    }}
+                    onHide={handleModalClose}
                     prefillVictim={selectedVictim}
+                    prevVictims={victims.filter(v => v.parent_id === selectedVictim.parent_id)}
                 />
             )}
         </div>
