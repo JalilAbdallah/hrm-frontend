@@ -53,7 +53,6 @@ const StatusBreakdownDialog = ({ isOpen, onClose, title, data, type }) => {
   return (
     <div className="fixed inset-0 bg-gray-300/60 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl max-w-md w-full max-h-[90vh] overflow-hidden shadow-2xl">
-        {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
@@ -72,7 +71,6 @@ const StatusBreakdownDialog = ({ isOpen, onClose, title, data, type }) => {
           </div>
         </div>
 
-        {/* Content */}
         <div className="p-6">
           {sortedData.length > 0 ? (
             <div className="space-y-4">
@@ -104,7 +102,6 @@ const StatusBreakdownDialog = ({ isOpen, onClose, title, data, type }) => {
                       </div>
                     </div>
                     
-                    {/* Progress bar */}
                     <div className="mt-3">
                       <div className="w-full bg-white bg-opacity-50 rounded-full h-2">
                         <div 
@@ -128,7 +125,6 @@ const StatusBreakdownDialog = ({ isOpen, onClose, title, data, type }) => {
           )}
         </div>
 
-        {/* Footer */}
         <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
           <button
             onClick={onClose}

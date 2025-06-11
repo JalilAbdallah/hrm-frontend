@@ -33,13 +33,12 @@ const ReportDetailDialog = ({ report, isOpen, onClose, onStatusUpdate }) => {
   if (!isOpen || !report) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-gray-100/70 bg-opacity-50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl max-w-6xl w-full max-h-[95vh] overflow-hidden shadow-2xl">
         <DialogHeader report={report} onClose={onClose} />
         
         <div className="overflow-y-auto max-h-[calc(95vh-80px)]">
           <div className="p-6 space-y-8">
-            {/* Key Information Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <StatusCard report={report} onStatusUpdate={handleStatusUpdate} />
               <BasicInfoCard report={report} />

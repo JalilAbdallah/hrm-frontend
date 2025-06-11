@@ -76,11 +76,12 @@ const InstitutionReports = () => {
         })),
         evidence: formData.evidence.map(ev => ({
           type: ev.type,
-          url: ev.url,
+          url: "ir-2025-116",
           description: ev.description || ''
         }))
       };
-
+      console.log('Submitting report data:', reportData);
+      
       const result = await createReport(reportData);
       console.log('Report submitted successfully:', result);
       setSubmitSuccess(true);
