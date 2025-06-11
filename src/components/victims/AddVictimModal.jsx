@@ -9,7 +9,6 @@ import {Toast} from 'primereact/toast';
 import {createVictim, updateVictimListByCase} from '../../services/victimsService';
 import {useAuth} from '../../context/AuthContext';
 
-
 const genders = [
     {label: "Male", value: "male"},
     {label: "Female", value: "female"},
@@ -147,7 +146,6 @@ const AddVictimModal = ({visible, onHide, prefillVictim, prevVictims}) => {
             <Toast ref={toast}/>
             <Dialog header="Add Victim/Witness" visible={visible} style={{width: '50vw'}} onHide={onHide}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
                     <div className="flex flex-col gap-2">
                         <label htmlFor="victim_type">Victim Type</label>
                         <Dropdown

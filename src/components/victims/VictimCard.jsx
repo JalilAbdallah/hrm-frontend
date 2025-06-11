@@ -1,12 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import { ConfirmDialog } from 'primereact/confirmdialog';
 import { confirmDialog } from 'primereact/confirmdialog';
 
 const VictimCard = ({ victim, onApprove, onDelete }) => {
     const toastRef = useRef(null);
-    const [visible, setVisible] = useState(false);
 
     const handleApprove = () => {
         onApprove(victim);
@@ -38,7 +36,6 @@ const VictimCard = ({ victim, onApprove, onDelete }) => {
     return (
         <div className="p-4 border rounded shadow-sm bg-white space-y-2">
             <Toast ref={toastRef} />
-            <ConfirmDialog />
 
             <h3 className="text-lg font-bold text-gray-900">
                 {victim.anonymous ? 'Anonymous' : victim.name}
