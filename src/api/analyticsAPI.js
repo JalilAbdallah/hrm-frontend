@@ -26,11 +26,10 @@ export const fetchDashboardData = async () => {
   }
 };
 
-export const fetchTrendData = async (data) => {
+export const fetchTrendData = async (date_from = 2015, date_to = 2025) => {
   try {
-    const response = await apiFetch(ANALYTICS_ENDPOINTS.GET_TRENDS, {
+    const response = await apiFetch(ANALYTICS_ENDPOINTS.GET_TRENDS(date_from, date_to), {
       method: 'GET',
-      body: JSON.stringify({ data }),
     });
     return response;
   } catch (error) {
