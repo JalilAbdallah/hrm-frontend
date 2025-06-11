@@ -15,8 +15,6 @@ export const listReports = async ({
   city = '',
   date_from = '',
   date_to = '',
-  skip = 0,
-  limit = 100,
 } = {}) => {
   // Build the params object
   const params = {
@@ -25,8 +23,6 @@ export const listReports = async ({
     city,
     date_from,
     date_to,
-    skip,
-    limit,
   };
 
   // OPTIONAL: remove empty strings so the query-string is clean
@@ -40,6 +36,7 @@ export const listReports = async ({
 };
 
 export const createReport = async (reportData) => {
+  console.log('Creating report with data:', reportData);
   const response = await apiClient.post('/reports', reportData);
   return response.data;
 };
