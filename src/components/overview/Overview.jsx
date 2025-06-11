@@ -6,7 +6,7 @@ import { fetchDashboardData, fetchTrendData } from '../../api/analyticsAPI';
 import StatusBreakdownDialog from './StatusBreakdownDialog';
 import ViolationTrendsChart from './ViolationTrendsChart';
 import ViolationsPieChart from './ViolationsPieChart';
-
+import GeoMapVisualization from './GeoMapVisualization';
 
 const Overview = () => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -105,17 +105,16 @@ const Overview = () => {
     { id: 4, action: 'Case resolved', description: 'Arbitrary detention case closed', time: '1 day ago', type: 'case' }
   ];  return (
     <div className="space-y-8">
-      {/* Error Display */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center">
             <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
             <p className="text-red-700">Failed to load dashboard data: {error}</p>
           </div>
-        </div>      )}
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center max-w-5xl mx-auto">
+        </div>
+      )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statsCards.map((stat, index) => {
           const IconComponent = stat.icon;          const colorClasses = {
             blue: 'bg-blue-500 text-blue-100',
@@ -180,6 +179,8 @@ const Overview = () => {
         data={dialogState.data}
         type={dialogState.type}
       />
+
+      <GeoMapVisualization />
     </div>
   );
 };

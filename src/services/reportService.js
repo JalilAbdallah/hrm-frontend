@@ -1,16 +1,5 @@
-// src/services/reportsService.js
+import {apiClient} from './configService';
 
-import axios from 'axios';
-
-const apiClient = axios.create({
-  baseURL:'http://localhost:8000',
-  headers: {
-    'Content-Type': 'application/json',
-    ...(localStorage.getItem('authToken') && {
-      Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-    }),
-  },
-});
 
 export const listReports = async ({
   status = '',
@@ -19,7 +8,6 @@ export const listReports = async ({
   date_from = '',
   date_to = '',
 } = {}) => {
-  // Build the params object
   const params = {
     status,
     country,
@@ -28,12 +16,10 @@ export const listReports = async ({
     date_to,
   };
 
-  // OPTIONAL: remove empty strings so the query-string is clean
   Object.keys(params).forEach(
     key => (params[key] === '' || params[key] === undefined) && delete params[key],
   );
 
-  // Pass params as the second argument to axios
   const { data } = await apiClient.get('/reports', { params });
   return data;
 };

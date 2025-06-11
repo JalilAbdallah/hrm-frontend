@@ -1,39 +1,59 @@
 import { useState } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, AlertCircle } from 'lucide-react';
 import FormSection from './FormSection';
 
 const LocationInput = ({ location, onLocationChange }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleLocationSelect = async () => {
     if (!location.country || !location.city) return;
     
     setIsLoading(true);
+    setError(null);
+    
     try {
-      const mockCoordinates = {
-        "Idlib, Syria": [36.6561, 36.8731],
-        "Aleppo, Syria": [36.2021, 37.1343],
-        "Damascus, Syria": [33.5138, 36.2765],
-        "Gaza, Palestine": [34.4668, 31.5017],
-        "Beirut, Lebanon": [35.5018, 33.8938]
-      };
+      const query = `${location.city}, ${location.country}`;
       
-      const key = `${location.city}, ${location.country}`;
-      const coords = mockCoordinates[key] || [0, 0];
-      
-      onLocationChange({
-        ...location,
-        coordinates: {
-          type: "Point",
-          coordinates: coords
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&addressdetails=1`,
+        {
+          headers: {
+            'User-Agent': 'IncidentReportingApp/1.0' 
+          }
         }
-      });
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        const result = data[0];
+        const coordinates = [parseFloat(result.lon), parseFloat(result.lat)];
+        
+        onLocationChange({
+          ...location,
+          coordinates: {
+            type: "Point",
+            coordinates: coordinates
+          },
+          displayName: result.display_name 
+        });
+      } else {
+        setError('Location not found. Please check the city and country names.');
+      }
     } catch (error) {
       console.error('Geocoding error:', error);
+      setError('Failed to get coordinates. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
+
 
   return (
     <FormSection icon={MapPin} title="Incident Location">
@@ -67,13 +87,40 @@ const LocationInput = ({ location, onLocationChange }) => {
         </div>
       </div>
       
-      {location.coordinates && (
+      <div className="mt-4">
+        <button
+          type="button"
+          onClick={handleLocationSelect}
+          disabled={!location.country || !location.city || isLoading}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 text-sm font-medium"
+        >
+          {isLoading ? 'Getting coordinates...' : 'Get Coordinates'}
+        </button>
+      </div>
+
+      {error && (
+        <div className="mt-4 p-4 bg-red-50 rounded-xl border border-red-200">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5 text-red-600" />
+            <p className="text-sm font-medium text-red-800">{error}</p>
+          </div>
+        </div>
+      )}
+      
+      {location.coordinates && !error && (
         <div className="mt-4 p-4 bg-green-50 rounded-xl border border-green-200">
           <div className="flex items-center gap-2">
             <MapPin className="w-5 h-5 text-green-600" />
-            <p className="text-sm font-medium text-green-800">
-              Coordinates: {location.coordinates.coordinates[1]}, {location.coordinates.coordinates[0]}
-            </p>
+            <div>
+              <p className="text-sm font-medium text-green-800">
+                Coordinates: {location.coordinates.coordinates[1].toFixed(6)}, {location.coordinates.coordinates[0].toFixed(6)}
+              </p>
+              {location.displayName && (
+                <p className="text-xs text-green-700 mt-1">
+                  {location.displayName}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       )}
