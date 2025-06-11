@@ -270,7 +270,6 @@ const IncidentReports = () => {
     setReports(prev => [report, ...prev]);
     setActiveView('list');
     
-    // Reset form
     setNewReport({
       anonymous: false,
       incident_details: {

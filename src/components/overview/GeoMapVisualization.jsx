@@ -12,14 +12,18 @@ const GeoMapVisualization = () => {
     violation_type: '',
     country: ''
   });
+  const [tempFilters, setTempFilters] = useState({
+    violation_type: '',
+    country: ''
+  });
 
   const violationColors = {
-    'attack_on_medical': 'red',
-    'attack_on_education': 'orange',
-    'war_crimes': 'blue',
-    'civilian_targeting': 'green',
-    'infrastructure_damage': 'amber',
-    'other': 'gray'
+    'attack_on_medical': '#dc2626',
+    'attack_on_education': '#ea580c',
+    'war_crimes': '#7c2d12',
+    'civilian_targeting': '#b91c1c',
+    'infrastructure_damage': '#f59e0b',
+    'other': '#6b7280'
   };
 
   const violationLabels = {
@@ -31,11 +35,11 @@ const GeoMapVisualization = () => {
     'other': 'Other'
   };
 
-  const fetchGeodata = async () => {
+  const fetchGeodata = async (filterParams = filters) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getGeodata(filters);
+      const response = await getGeodata(filterParams);
       setGeodata(response.data || []);
     } catch (err) {
       setError('Failed to fetch geodata');
@@ -47,20 +51,28 @@ const GeoMapVisualization = () => {
 
   useEffect(() => {
     fetchGeodata();
-  }, [filters]);
+  }, []);
 
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({
+  const handleTempFilterChange = (key, value) => {
+    setTempFilters(prev => ({
       ...prev,
       [key]: value
     }));
   };
 
-  const clearFilters = () => {
-    setFilters({
+  const applyFilters = () => {
+    setFilters(tempFilters);
+    fetchGeodata(tempFilters);
+  };
+
+  const resetFilters = () => {
+    const emptyFilters = {
       violation_type: '',
       country: ''
-    });
+    };
+    setTempFilters(emptyFilters);
+    setFilters(emptyFilters);
+    fetchGeodata(emptyFilters);
   };
 
   const getMarkerColor = (violationTypes) => {
@@ -121,6 +133,13 @@ const GeoMapVisualization = () => {
           </div>
           <div className="text-sm text-gray-600">
             {geodata.length} locations found
+            {(filters.violation_type || filters.country) && (
+              <span className="ml-2 text-blue-600">
+                (Filtered: {filters.violation_type && `Type: ${violationLabels[filters.violation_type]}`}
+                {filters.violation_type && filters.country && ', '}
+                {filters.country && `Country: ${filters.country}`})
+              </span>
+            )}
           </div>
         </div>
 
@@ -131,8 +150,8 @@ const GeoMapVisualization = () => {
           </div>
           
           <select
-            value={filters.violation_type}
-            onChange={(e) => handleFilterChange('violation_type', e.target.value)}
+            value={tempFilters.violation_type}
+            onChange={(e) => handleTempFilterChange('violation_type', e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">All Violation Types</option>
@@ -147,22 +166,39 @@ const GeoMapVisualization = () => {
           <input
             type="text"
             placeholder="Filter by country..."
-            value={filters.country}
-            onChange={(e) => handleFilterChange('country', e.target.value)}
+            value={tempFilters.country}
+            onChange={(e) => handleTempFilterChange('country', e.target.value)}
             className="px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
 
-          {(filters.violation_type || filters.country) && (
+          <div className="flex space-x-2">
             <button
-              onClick={clearFilters}
-              className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 underline"
+              onClick={applyFilters}
+              disabled={loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
-              Clear filters
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Loading...</span>
+                </>
+              ) : (
+                <span>Apply Filters</span>
+              )}
             </button>
-          )}
+
+            <button
+              onClick={resetFilters}
+              disabled={loading}
+              className="px-4 py-2 bg-gray-500 text-white rounded-md text-sm hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Reset
+            </button>
+          </div>
         </div>
       </div>
 
+      {/* Legend */}
       <div className="bg-white border-b p-4">
         <div className="flex flex-wrap items-center gap-4">
           <span className="text-sm font-medium text-gray-700">Legend:</span>

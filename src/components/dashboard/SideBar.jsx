@@ -17,16 +17,11 @@ const Sidebar = () => {
 
   const { user } = useAuth();
   const handleProfileSettings = () => {
-    // Navigate to profile settings or open modal
     console.log('Opening profile settings...');
-    // setActiveModule('profile-settings'); // if you have a profile settings module
   };
 
   const handleLogout = () => {
-    // Handle logout logic
     console.log('Logging out...');
-    // You might want to call an auth context method here
-    // Example: logout();
   };
 
   return (

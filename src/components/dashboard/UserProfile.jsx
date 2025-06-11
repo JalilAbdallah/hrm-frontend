@@ -15,7 +15,7 @@ const UserProfile = ({
 
   const handleLogout = () => {
     setShowUserMenu(false);
-    logout(); // Call the logout function from AuthContext
+    logout();
   };
 
   return (

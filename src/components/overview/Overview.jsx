@@ -112,7 +112,7 @@ const Overview = () => {
           </div>
         </div>
       )}
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statsCards.map((stat, index) => {
           const IconComponent = stat.icon;          const colorClasses = {
@@ -156,12 +156,10 @@ const Overview = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       </div>
 
-      {/* Violation Trends Chart */}
       {trendsData && !trendsLoading && (
         <ViolationTrendsChart data={trendsData} />
       )}
 
-      {/* Trends Loading State */}
       {trendsLoading && (
         <div className="bg-white rounded-xl p-8 text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
@@ -169,7 +167,6 @@ const Overview = () => {
         </div>
       )}
 
-      {/* Status Breakdown Dialog */}
       <StatusBreakdownDialog
         isOpen={dialogState.isOpen}
         onClose={closeDialog}

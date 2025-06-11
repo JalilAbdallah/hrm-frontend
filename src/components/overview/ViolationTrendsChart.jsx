@@ -11,7 +11,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Debounce utility function
   function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -24,7 +23,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
     };
   }
 
-  // Debounced fetch function
   const debouncedFetchData = useCallback(
     debounce(async (yearFrom, yearTo) => {
       try {
@@ -42,14 +40,12 @@ const ViolationTrendsChart = ({ data: initialData }) => {
     []
   );
 
-  // Effect to fetch data when year range changes
   useEffect(() => {
     if (yearRange[0] !== 1950 || yearRange[1] !== 2025) {
       debouncedFetchData(yearRange[0], yearRange[1]);
     }
   }, [yearRange, debouncedFetchData]);
 
-  // Initialize data when component mounts
   useEffect(() => {
     if (initialData) {
       setData(initialData);
@@ -58,15 +54,14 @@ const ViolationTrendsChart = ({ data: initialData }) => {
 
   if (!data) return null;
 
-  // Get violation types and their colors
   const violationTypes = data.violation_types_included || [];
   const violationColors = {
-    attack_on_medical: '#ef4444', // red
-    attack_on_education: '#3b82f6', // blue
-    war_crimes: '#dc2626', // dark red
-    civilian_targeting: '#f59e0b', // amber
-    infrastructure_damage: '#10b981', // emerald
-    other: '#6b7280' // gray
+    attack_on_medical: '#ef4444',
+    attack_on_education: '#3b82f6',
+    war_crimes: '#dc2626',
+    civilian_targeting: '#f59e0b',
+    infrastructure_damage: '#10b981',
+    other: '#6b7280'
   };
 
   const violationLabels = {
@@ -78,18 +73,15 @@ const ViolationTrendsChart = ({ data: initialData }) => {
     other: 'Other'
   };
 
-  // Process data for chart
   const chartData = data.data?.filter(yearData => yearData.total_violations > 0) || [];
   const maxViolations = Math.max(...chartData.map(year => year.total_violations), 1);
   
-  // Calculate chart dimensions - made bigger and more centered
   const chartWidth = 1150;
   const chartHeight = 600;
   const padding = { top: -500, right: 60, bottom: 100, left: 80 };
   const plotWidth = chartWidth - padding.left - padding.right;
   const plotHeight = chartHeight - padding.top - padding.bottom;
 
-  // Toggle violation type visibility
   const toggleViolationType = (type) => {
     const newSelected = new Set(selectedViolations);
     if (type === 'all') {
@@ -113,18 +105,15 @@ const ViolationTrendsChart = ({ data: initialData }) => {
     }
     setSelectedViolations(newSelected);
     
-    // Set hovered violation for line highlighting
     if (type !== 'all') {
       setHoveredViolation(newSelected.has(type) ? type : null);
     }
   };
 
-  // Handle year range change
   const handleYearRangeChange = (index, value) => {
     const newRange = [...yearRange];
     newRange[index] = parseInt(value);
     
-    // Ensure from year is not greater than to year
     if (index === 0 && newRange[0] > newRange[1]) {
       newRange[1] = newRange[0];
     } else if (index === 1 && newRange[1] < newRange[0]) {
@@ -134,7 +123,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
     setYearRange(newRange);
   };
 
-  // Generate path for a violation type
   const generatePath = (violationType) => {
     if (!selectedViolations.has(violationType) && !selectedViolations.has('all')) {
       return '';
@@ -153,7 +141,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
     return `M ${points.join(' L ')}`;
   };
 
-  // Generate points for circles
   const generatePoints = (violationType) => {
     if (!selectedViolations.has(violationType) && !selectedViolations.has('all')) {
       return [];
@@ -172,7 +159,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
 
   return (
     <div className="max-w-7xl mx-auto p-8 bg-white">
-      {/* Custom slider styles */}
       <style dangerouslySetInnerHTML={{
         __html: `
           .custom-slider {
@@ -226,7 +212,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
         `
       }} />
 
-      {/* Header */}
       <div className="text-center mb-10">
         <div className="flex items-center justify-center space-x-3 mb-4">
           <TrendingUp className="w-8 h-8 text-purple-600" />
@@ -237,7 +222,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
         </p>
       </div>
 
-      {/* Error Display */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8">
           <div className="flex items-center">
@@ -247,7 +231,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
         </div>
       )}
 
-      {/* Year Range Slider */}
       <div className="mb-10">
         <h3 className="text-xl font-semibold text-gray-700 mb-6 text-center">Year Range</h3>
         <div className="bg-white p-8 rounded-xl border border-gray-200 shadow-lg max-w-4xl mx-auto">
@@ -292,7 +275,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
         </div>
       </div>
 
-      {/* Legend/Filters */}
       <div className="mb-10">
         <h3 className="text-xl font-semibold text-gray-700 mb-6 text-center">Violation Types</h3>
         <div className="flex flex-wrap gap-4 justify-center">
@@ -332,10 +314,8 @@ const ViolationTrendsChart = ({ data: initialData }) => {
         </div>
       </div>
 
-      {/* Chart */}
       <div className="bg-gray-50 rounded-xl p-8 overflow-x-auto relative mb-10">
         <svg width={chartWidth} height={chartHeight} className="w-full h-auto">
-          {/* Grid lines */}
           {[0, 0.25, 0.5, 0.75, 1].map(ratio => (
             <g key={ratio}>
               <line
@@ -357,7 +337,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
             </g>
           ))}
 
-          {/* X-axis labels */}
           {chartData.map((yearData, index) => (
             <text
               key={yearData.year}
@@ -370,7 +349,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
             </text>
           ))}
 
-          {/* Lines for each violation type */}
           {violationTypes.map(type => {
             const isVisible = selectedViolations.has(type) || selectedViolations.has('all');
             const isHovered = hoveredViolation === type || hoveredViolation === 'all';
@@ -378,7 +356,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
             
             return (
               <g key={type}>
-                {/* Glow effect for hovered line */}
                 {isHovered && isVisible && (
                   <path
                     d={generatePath(type)}
@@ -390,7 +367,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
                   />
                 )}
                 
-                {/* Main line */}
                 <path
                   d={generatePath(type)}
                   fill="none"
@@ -407,7 +383,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
                   }}
                 />
                 
-                {/* Points */}
                 {generatePoints(type).map((point, index) => (
                   <g key={index}>
                     <circle
@@ -440,7 +415,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
             );
           })}
 
-          {/* Axes */}
           <line
             x1={padding.left}
             y1={padding.top + plotHeight}
@@ -459,7 +433,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
           />
         </svg>
         
-        {/* Floating tooltip for hovered points */}
         {hoveredPoint && (
           <div 
             className="absolute bg-white border border-gray-300 rounded-lg shadow-lg p-4 pointer-events-none z-10"
@@ -482,7 +455,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
               <div>Year: {hoveredPoint.data.year}</div>
               <div>Violations: {hoveredPoint.data.count}</div>
             </div>
-            {/* Small arrow pointing down */}
             <div 
               className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0"
               style={{
@@ -495,7 +467,6 @@ const ViolationTrendsChart = ({ data: initialData }) => {
         )}
       </div>
 
-      {/* Summary Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-blue-50 p-6 rounded-lg">
           <div className="flex items-center space-x-3">

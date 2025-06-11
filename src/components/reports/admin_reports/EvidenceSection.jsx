@@ -69,7 +69,6 @@ const EvidenceSection = ({ evidence }) => {
                 </div>
               </div>
 
-              {/* Media Preview */}
               {isImage(evidenceItem.type) && (
                 <div className="mb-4">
                   <div className="relative group cursor-pointer" onClick={() => setSelectedImage(getFullUrl(evidenceItem.url))}>
@@ -137,7 +136,6 @@ const EvidenceSection = ({ evidence }) => {
         </div>
       </div>
 
-      {/* Image Modal */}
       {selectedImage && (
         <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
           <div className="relative max-w-4xl max-h-full">
@@ -156,7 +154,6 @@ const EvidenceSection = ({ evidence }) => {
         </div>
       )}
 
-      {/* Video Modal */}
       {selectedVideo && (
         <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
           <div className="relative max-w-4xl max-h-full">

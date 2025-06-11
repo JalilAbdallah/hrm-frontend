@@ -73,11 +73,9 @@ const AdminReportModule = () => {
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Manage and review incident reports</h1>
-          {/* <p className="text-gray-600">Manage and review incident reports</p> */}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Reports Grid */}
           <div className="lg:col-span-3">
             {loading ? (
               <div className="flex justify-center items-center h-64">
@@ -102,7 +100,6 @@ const AdminReportModule = () => {
             )}
           </div>
 
-          {/* Filter Panel */}
           <div className="lg:col-span-1">
             <FilterPanel
               filters={filters}
@@ -113,7 +110,6 @@ const AdminReportModule = () => {
         </div>
       </div>
 
-      {/* Report Detail Dialog */}
       <ReportDetailDialog
         report={selectedReport}
         isOpen={isDialogOpen}
