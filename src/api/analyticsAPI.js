@@ -38,3 +38,16 @@ export const fetchTrendData = async (date_from = 2015, date_to = 2025) => {
     });
   }
 };
+
+export const fetchViolaitonTrends = async (date_from = 2015, date_to = 2025, city = '', country = '') => {
+  try {
+    const response = await apiFetch(ANALYTICS_ENDPOINTS.GET_TRENDS_BY_VIOLATION(date_from, date_to, city, country), {
+      method: 'GET',
+    });
+    return response;
+  } catch (error) {
+    throw new Error(`Failed to fetch violation trends: ${error.message}`, {
+      cause: { status: error.status, details: error.details },
+    });
+  }
+};

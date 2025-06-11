@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { fetchDashboardData, fetchTrendData } from '../../api/analyticsAPI';
 import StatusBreakdownDialog from './StatusBreakdownDialog';
 import ViolationTrendsChart from './ViolationTrendsChart';
+import ViolationsPieChart from './ViolationsPieChart';
 import GeoMapVisualization from './GeoMapVisualization';
 
 const Overview = () => {
@@ -154,9 +155,7 @@ const Overview = () => {
         })}
       </div>        
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      </div>
-
-      {/* Violation Trends Chart */}
+      </div>      {/* Violation Trends Chart */}
       {trendsData && !trendsLoading && (
         <ViolationTrendsChart data={trendsData} />
       )}
@@ -168,6 +167,9 @@ const Overview = () => {
           <p className="text-gray-600 text-lg">Loading violation trends data...</p>
         </div>
       )}
+
+      {/* Violations Pie Chart */}
+      <ViolationsPieChart />
 
       {/* Status Breakdown Dialog */}
       <StatusBreakdownDialog
