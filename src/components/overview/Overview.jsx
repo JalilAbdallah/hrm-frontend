@@ -1,13 +1,16 @@
 import { 
-  FileText, AlertTriangle, Users, Shield, Activity 
+  FileText, AlertTriangle, Users, Shield, Activity, TrendingUp 
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { fetchDashboardData } from '../../api/analyticsAPI';
+import { fetchDashboardData, fetchTrendData } from '../../api/analyticsAPI';
 import StatusBreakdownDialog from './StatusBreakdownDialog';
+import ViolationTrendsChart from './ViolationTrendsChart';
 
 const Overview = () => {
   const [dashboardData, setDashboardData] = useState(null);
+  const [trendsData, setTrendsData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [trendsLoading, setTrendsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dialogState, setDialogState] = useState({
     isOpen: false,
@@ -15,6 +18,7 @@ const Overview = () => {
     data: [],
     type: ''
   });
+
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
@@ -30,7 +34,21 @@ const Overview = () => {
       }
     };
 
+    const loadTrendsData = async () => {
+      try {
+        setTrendsLoading(true);
+        const data = await fetchTrendData();
+        setTrendsData(data);
+      } catch (err) {
+        console.error('Failed to fetch trends data:', err);
+        setError(err.message);
+      } finally {
+        setTrendsLoading(false);
+      }
+    };
+
     loadDashboardData();
+    loadTrendsData();
   }, []);
 
   const openBreakdownDialog = (type, title, data) => {
@@ -40,9 +58,7 @@ const Overview = () => {
       data,
       type
     });
-  };
-
-  const closeDialog = () => {
+  };  const closeDialog = () => {
     setDialogState({
       isOpen: false,
       title: '',
@@ -50,6 +66,7 @@ const Overview = () => {
       type: ''
     });
   };
+
   const statsCards = [
     { 
       title: 'Total Cases', 
@@ -75,14 +92,8 @@ const Overview = () => {
       clickable: true,
       onClick: () => openBreakdownDialog('victims', 'Victims by Risk Level', dashboardData?.victims_by_risk || [])
     },
-    { 
-      title: 'Urgent Cases', 
-      value: '7', 
-      icon: Shield, 
-      color: 'red', 
-      change: '2 resolved today',
-      clickable: false
-    }
+    
+      
   ];
 
   const recentActivities = [
@@ -90,8 +101,7 @@ const Overview = () => {
     { id: 2, action: 'Report submitted', description: 'Anonymous incident report from Aleppo', time: '4 hours ago', type: 'report' },
     { id: 3, action: 'Victim status updated', description: 'Risk assessment changed to HIGH', time: '6 hours ago', type: 'victim' },
     { id: 4, action: 'Case resolved', description: 'Arbitrary detention case closed', time: '1 day ago', type: 'case' }
-  ];
-  return (
+  ];  return (
     <div className="space-y-8">
       {/* Error Display */}
       {error && (
@@ -100,16 +110,17 @@ const Overview = () => {
             <AlertTriangle className="w-5 h-5 text-red-600 mr-2" />
             <p className="text-red-700">Failed to load dashboard data: {error}</p>
           </div>
-        </div>
-      )}      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        </div>      )}
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center max-w-5xl mx-auto">
         {statsCards.map((stat, index) => {
-          const IconComponent = stat.icon;
-          const colorClasses = {
+          const IconComponent = stat.icon;          const colorClasses = {
             blue: 'bg-blue-500 text-blue-100',
             orange: 'bg-orange-500 text-orange-100',
             green: 'bg-green-500 text-green-100',
-            red: 'bg-red-500 text-red-100'
+            red: 'bg-red-500 text-red-100',
+            purple: 'bg-purple-500 text-purple-100'
           };
           
           const CardWrapper = stat.clickable ? 'button' : 'div';
@@ -141,49 +152,22 @@ const Overview = () => {
             </CardWrapper>
           );
         })}
-      </div>
-
+      </div>        
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* System Status */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">Recent Activity</h3>
-            <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">View All</button>
-          </div>
-          <div className="space-y-4">
-            {recentActivities.map((activity) => (
-              <div key={activity.id} className="flex items-start space-x-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <Activity size={16} className="text-blue-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900">{activity.action}</p>
-                  <p className="text-sm text-gray-600 mt-1">{activity.description}</p>
-                  <p className="text-xs text-gray-500 mt-2">{activity.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">Quick Actions</h3>
-          <div className="space-y-3">
-            <button className="w-full flex items-center space-x-3 p-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors text-left">
-              <FileText size={20} className="text-blue-600" />
-              <span className="font-medium text-gray-700">Create New Case</span>
-            </button>
-            <button className="w-full flex items-center space-x-3 p-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-colors text-left">
-              <AlertTriangle size={20} className="text-orange-600" />
-              <span className="font-medium text-gray-700">Submit Report</span>
-            </button>
-            <button className="w-full flex items-center space-x-3 p-4 rounded-xl border-2 border-dashed border-gray-200 hover:border-green-300 hover:bg-green-50 transition-colors text-left">
-              <Users size={20} className="text-green-600" />
-              <span className="font-medium text-gray-700">Add Victim/Witness</span>
-            </button>          </div>
-        </div>
       </div>
+
+      {/* Violation Trends Chart */}
+      {trendsData && !trendsLoading && (
+        <ViolationTrendsChart data={trendsData} />
+      )}
+
+      {/* Trends Loading State */}
+      {trendsLoading && (
+        <div className="bg-white rounded-xl p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Loading violation trends data...</p>
+        </div>
+      )}
 
       {/* Status Breakdown Dialog */}
       <StatusBreakdownDialog
