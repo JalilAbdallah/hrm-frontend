@@ -177,6 +177,8 @@ const Overview = () => {
       />
 
       <GeoMapVisualization />
+
+      <ViolationsPieChart />
     </div>
   );
 };

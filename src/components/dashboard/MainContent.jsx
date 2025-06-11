@@ -22,10 +22,6 @@ const MainContent = () => {
         return <ReportsModule />;
       case 'victims':
         return <VictimListPage />;
-      case 'analytics':
-        return <Analytics />;
-      case 'settings':
-        return <Settings />;
       default:
         return <Overview />;
     }

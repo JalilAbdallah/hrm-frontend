@@ -6,7 +6,7 @@ export const menuItems = [
     id: 'overview',
     label: 'Overview',
     icon: Home,
-    role: 'all',
+    role: 'admin',
     component: 'OverviewModule',
     description: 'Dashboard overview and quick stats'
   },
@@ -33,16 +33,7 @@ export const menuItems = [
     role: 'admin',
     component: 'VictimDatabase',
     description: 'Manage victim information (Admin only)'
-  },
-  {
-    id: 'analytics',
-    label: 'Data Analytics',
-    icon: BarChart3,
-    role: 'admin',
-    component: 'Analytics',
-    description: 'Data insights and analytics'
-  },
- 
+  }, 
 ];
 
 export const userRoles = {

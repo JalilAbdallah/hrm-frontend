@@ -1,6 +1,6 @@
 import { Trash2 } from 'lucide-react';
 
-const GENDER_OPTIONS = ["male", "female", "other", "unknown"];
+const GENDER_OPTIONS = ["male", "female"];
 const OCCUPATION_OPTIONS = ["civilian", "doctor", "nurse", "teacher", "student", "aid_worker", "journalist", "other"];
 
 const VictimCard = ({ victim, index, updateVictim, removeVictim }) => (

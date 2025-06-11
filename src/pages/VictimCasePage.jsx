@@ -11,11 +11,11 @@ const riskLevels = [
 ];
 
 const VictimCasePage = () => {
-    const {caseId} = useParams();
+    const {_id} = useParams();
     const [victims, setVictims] = useState([]);
     const [search, setSearch] = useState('');
     const toast = React.useRef(null);
-
+    const caseId = _id || null;
     useEffect(() => {
         const fetchVictims = async () => {
             try {

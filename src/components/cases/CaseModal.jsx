@@ -4,6 +4,7 @@ import { Button } from 'primereact/button';
 import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
 import { Toast } from 'primereact/toast';
 import { MapPin, Users, AlertTriangle, Calendar, Clock, User, FileText, Archive, ExternalLink, RotateCcw } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const statusColors = {
   under_investigation: "bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-800 border-amber-200",
@@ -21,6 +22,7 @@ const priorityColors = {
 
 const CaseModal = ({ visible, onHide, caseData, onArchiveCase, onRestoreCase }) => {
   const toast = useRef(null);
+  const navigate = useNavigate();
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -122,7 +124,8 @@ const CaseModal = ({ visible, onHide, caseData, onArchiveCase, onRestoreCase }) 
   return (
     <>
       <Toast ref={toast} />
-      <ConfirmPopup />      <Dialog
+      <ConfirmPopup />      
+      <Dialog
         visible={visible}
         onHide={onHide}
         header={headerTemplate}
@@ -267,9 +270,8 @@ const CaseModal = ({ visible, onHide, caseData, onArchiveCase, onRestoreCase }) 
                 <Button
                   label="View Victims"
                   icon="pi pi-users"
-                  className="p-button-outlined p-button-secondary"
                   onClick={() => {
-                    // Navigation logic will be implemented later
+                    navigate(`/victims/${caseData._id}`);
                     console.log('Navigate to victims for case:', caseData.case_id);
                   }}
                 />

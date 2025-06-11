@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
     if (isLoading) {
       document.title = 'Loading...';
     } else if (user) {
-      document.title = `${user.role || 'User'} Portal`;
+      document.title = `HRM - Human Monitoring System (${user.name})`;
     } else {
       document.title = 'Login';
     }

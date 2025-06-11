@@ -4,6 +4,7 @@ import DashboardPage from './pages/dashboard/DashboardPage'
 import PageNotFound from './pages/pageNotFound/PageNotFound.jsx'
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
 import { ProtectedRoute } from './components/Routing/ProtectedRoute.jsx'
+import VictimCasePage from './pages/VictimCasePage.jsx'
 
 
 function Layout() {
@@ -25,7 +26,8 @@ function App() {
           children: [
             { index: true, element: <DashboardPage /> },
             { path: 'dashboard', element: <DashboardPage /> },
-         
+            { path: 'victims/:_id', element: <VictimCasePage /> },
+
           ],
         },
         { path: 'login', element: <AuthPage /> },

@@ -14,13 +14,14 @@ export const useDashboard = () => {
 };
 
 export const DashboardProvider = ({ children }) => {
-  const [activeModule, setActiveModule] = useState('overview');
+    const { user } = useAuth();
+  const userRole = user?.role || 'institution'; // Default to 'institution' if no role
+  const [activeModule, setActiveModule] = useState(user?.role== 'admin' ? 'overview' : 'reports'); // Default to 'overview' for admin, 'report' for others
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   
   // Get user role from AuthContext
-  const { user } = useAuth();
-  const userRole = user?.role || 'institution'; // Default to 'institution' if no role
+
 
   // Filter menu items based on user role
   const filteredMenuItems = menuItems.filter(item => {
